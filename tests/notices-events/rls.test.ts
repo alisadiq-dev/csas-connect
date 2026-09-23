@@ -19,8 +19,11 @@ import { withUserDbFor } from "../identity/with-user-test-db";
 
 let fixtures: {
   programId: string;
+  batchId: string;
   classId: string;
   otherClassId: string;
+  courseId: string;
+  termId: string;
   adminId: string;
   crId: string;
   nonCrStudentId: string;
@@ -68,9 +71,24 @@ beforeAll(async () => {
     .insert(courseOfferings)
     .values({ classId: cls.id, courseId: course.id, termId: term.id, teacherId, semesterNumber: 1 });
 
-  fixtures = { programId: program.id, classId: cls.id, otherClassId: otherCls.id, adminId, crId, nonCrStudentId, teacherId, outsiderTeacherId };
+  fixtures = {
+    programId: program.id,
+    batchId: batch.id,
+    classId: cls.id,
+    otherClassId: otherCls.id,
+    courseId: course.id,
+    termId: term.id,
+    adminId,
+    crId,
+    nonCrStudentId,
+    teacherId,
+    outsiderTeacherId,
+  };
 });
 
+// See tests/identity/roll-number.test.ts's afterAll for why every fixture
+// (up to the program/batch/class) gets cleaned up here, not just the leaf
+// rows.
 afterAll(async () => {
   if (!fixtures) return;
   await testDb.delete(noticesEvents).where(eq(noticesEvents.classId, fixtures.classId));
@@ -85,6 +103,12 @@ afterAll(async () => {
   await testDb.execute(
     sql`delete from auth.users where id in (${fixtures.adminId}, ${fixtures.crId}, ${fixtures.nonCrStudentId}, ${fixtures.teacherId}, ${fixtures.outsiderTeacherId})`,
   );
+  await testDb.delete(courses).where(eq(courses.id, fixtures.courseId));
+  await testDb.delete(academicTerms).where(eq(academicTerms.id, fixtures.termId));
+  await testDb.delete(classes).where(eq(classes.id, fixtures.otherClassId));
+  await testDb.delete(classes).where(eq(classes.id, fixtures.classId));
+  await testDb.delete(batches).where(eq(batches.id, fixtures.batchId));
+  await testDb.delete(programs).where(eq(programs.id, fixtures.programId));
 });
 
 describe("notices_events RLS (Task 37)", () => {

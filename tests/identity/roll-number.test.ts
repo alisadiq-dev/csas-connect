@@ -1,7 +1,8 @@
-import { sql } from "drizzle-orm";
-import { describe, expect, it, vi } from "vitest";
+import { inArray, sql } from "drizzle-orm";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import { testDb } from "../db";
 import { batches, classes, programs } from "@/db/schema/academic-structure";
+import { authUsers } from "@/db/schema-ref/auth";
 import { studentProfiles } from "@/db/schema/identity";
 
 vi.mock("@/db", async () => {
@@ -11,13 +12,31 @@ vi.mock("@/db", async () => {
 
 const { generateRollNumber } = await import("@/lib/identity/roll-number");
 
+// Every fixture this file creates gets tracked here and deleted in
+// afterAll. Without this, rows accumulate in the shared test database
+// across every `npm test` invocation (vitest doesn't reset it between
+// runs — only db/migrations/ is (re)applied, per tests/global-setup.ts) —
+// confirmed as the actual cause of an intermittent
+// student_profiles_roll_number_unique collision: a fresh run's randomly
+// chosen YEAR_BASE colliding (mod 100, same sequence number) with a
+// PREVIOUS, never-cleaned-up run's leftover row, not a collision within a
+// single run (this file's own monotonic nextYear() counter already
+// prevents that).
+const createdProgramIds: string[] = [];
+const createdBatchIds: string[] = [];
+const createdClassIds: string[] = [];
+const createdUserIds: string[] = [];
+
 async function makeClass(intakeYear: number, sectionType: "regular" | "replica" = "regular") {
   const [program] = await testDb
     .insert(programs)
     .values({ name: `Roll number test ${Date.now()}`, code: `RN-${Date.now()}-${Math.random()}` })
     .returning();
+  createdProgramIds.push(program.id);
   const [batch] = await testDb.insert(batches).values({ programId: program.id, intakeYear }).returning();
+  createdBatchIds.push(batch.id);
   const [cls] = await testDb.insert(classes).values({ batchId: batch.id, sectionType, currentSemester: 1 }).returning();
+  createdClassIds.push(cls.id);
   return cls;
 }
 
@@ -43,9 +62,28 @@ async function makeStudent(classId: string, rollNumber: string) {
     sql`insert into auth.users (email) values (${`rn-${rollNumber}-${Date.now()}-${Math.random()}@example.test`}) returning id`,
   );
   const userId = rows[0].id;
+  createdUserIds.push(userId);
   await testDb.insert(studentProfiles).values({ userId, fullName: "Test Student", rollNumber, classId });
   return userId;
 }
+
+afterAll(async () => {
+  if (createdClassIds.length > 0) {
+    await testDb.delete(studentProfiles).where(inArray(studentProfiles.classId, createdClassIds));
+  }
+  if (createdUserIds.length > 0) {
+    await testDb.delete(authUsers).where(inArray(authUsers.id, createdUserIds));
+  }
+  if (createdClassIds.length > 0) {
+    await testDb.delete(classes).where(inArray(classes.id, createdClassIds));
+  }
+  if (createdBatchIds.length > 0) {
+    await testDb.delete(batches).where(inArray(batches.id, createdBatchIds));
+  }
+  if (createdProgramIds.length > 0) {
+    await testDb.delete(programs).where(inArray(programs.id, createdProgramIds));
+  }
+});
 
 describe("generateRollNumber (Task 13)", () => {
   it("first student in a class gets sequence 1", async () => {

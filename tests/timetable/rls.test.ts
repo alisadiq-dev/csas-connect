@@ -17,7 +17,17 @@ import { withUserDbFor } from "../identity/with-user-test-db";
 // authenticated user (SELECT) can read timetable_slots/period_definitions;
 // only admin has INSERT/UPDATE/DELETE."
 
-let fixtures: { offeringId: string; adminId: string; studentId: string; slotId: string };
+let fixtures: {
+  programId: string;
+  batchId: string;
+  classId: string;
+  courseId: string;
+  termId: string;
+  offeringId: string;
+  adminId: string;
+  studentId: string;
+  slotId: string;
+};
 
 async function insertAuthUser(email: string): Promise<string> {
   const [{ id }] = (
@@ -53,9 +63,22 @@ beforeAll(async () => {
     .values({ courseOfferingId: offering.id, dayOfWeek: "mon", periodNumber: 1 })
     .returning();
 
-  fixtures = { offeringId: offering.id, adminId, studentId, slotId: slot.id };
+  fixtures = {
+    programId: program.id,
+    batchId: batch.id,
+    classId: cls.id,
+    courseId: course.id,
+    termId: term.id,
+    offeringId: offering.id,
+    adminId,
+    studentId,
+    slotId: slot.id,
+  };
 });
 
+// See tests/identity/roll-number.test.ts's afterAll for why every fixture
+// (up to the program/batch/class) gets cleaned up here, not just the leaf
+// rows.
 afterAll(async () => {
   if (!fixtures) return;
   await testDb.delete(timetableSlots).where(eq(timetableSlots.courseOfferingId, fixtures.offeringId));
@@ -63,6 +86,11 @@ afterAll(async () => {
   await testDb.delete(studentProfiles).where(eq(studentProfiles.userId, fixtures.studentId));
   await testDb.delete(adminProfiles).where(eq(adminProfiles.userId, fixtures.adminId));
   await testDb.execute(sql`delete from auth.users where id in (${fixtures.adminId}, ${fixtures.studentId})`);
+  await testDb.delete(courses).where(eq(courses.id, fixtures.courseId));
+  await testDb.delete(academicTerms).where(eq(academicTerms.id, fixtures.termId));
+  await testDb.delete(classes).where(eq(classes.id, fixtures.classId));
+  await testDb.delete(batches).where(eq(batches.id, fixtures.batchId));
+  await testDb.delete(programs).where(eq(programs.id, fixtures.programId));
 });
 
 describe("timetable RLS (Task 30)", () => {

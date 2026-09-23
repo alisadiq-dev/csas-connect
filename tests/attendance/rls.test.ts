@@ -19,6 +19,12 @@ import { withUserDbFor } from "../identity/with-user-test-db";
 // goes through withUserDbFor, exactly like tests/identity/rls.test.ts.
 
 let fixtures: {
+  programId: string;
+  batchId: string;
+  classId: string;
+  courseId: string;
+  otherCourseId: string;
+  termId: string;
   offeringId: string;
   otherOfferingId: string;
   adminId: string;
@@ -88,6 +94,12 @@ beforeAll(async () => {
   ]);
 
   fixtures = {
+    programId: program.id,
+    batchId: batch.id,
+    classId: cls.id,
+    courseId: course.id,
+    otherCourseId: otherCourse.id,
+    termId: term.id,
     offeringId: offering.id,
     otherOfferingId: otherOffering.id,
     adminId,
@@ -99,6 +111,11 @@ beforeAll(async () => {
   };
 });
 
+// Cleans up every fixture this file creates, all the way up to the
+// program/batch/class — without this, rows accumulate in the shared test
+// database across every `npm test` invocation (vitest doesn't reset it
+// between runs; see tests/identity/roll-number.test.ts's afterAll for the
+// same rationale, and the actual collision it was traced to).
 afterAll(async () => {
   if (!fixtures) return;
   await testDb.delete(attendanceRecords).where(eq(attendanceRecords.sessionId, fixtures.sessionId));
@@ -113,6 +130,12 @@ afterAll(async () => {
   await testDb.execute(
     sql`delete from auth.users where id in (${fixtures.adminId}, ${fixtures.teacherId}, ${fixtures.otherTeacherId}, ${fixtures.studentAId}, ${fixtures.studentBId})`,
   );
+  await testDb.delete(courses).where(eq(courses.id, fixtures.courseId));
+  await testDb.delete(courses).where(eq(courses.id, fixtures.otherCourseId));
+  await testDb.delete(academicTerms).where(eq(academicTerms.id, fixtures.termId));
+  await testDb.delete(classes).where(eq(classes.id, fixtures.classId));
+  await testDb.delete(batches).where(eq(batches.id, fixtures.batchId));
+  await testDb.delete(programs).where(eq(programs.id, fixtures.programId));
 });
 
 describe("attendance RLS (Task 18)", () => {

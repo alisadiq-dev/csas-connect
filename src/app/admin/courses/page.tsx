@@ -41,7 +41,7 @@ export default async function CoursesPage() {
           </label>
           <label className="flex flex-col gap-1 text-sm">
             <span className="text-zinc-700 dark:text-zinc-300">Title</span>
-            <input name="title" required placeholder="Probability Theory" className="w-56 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
+            <input name="title" required placeholder="Probability Theory" className="w-full sm:w-56 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
           </label>
           <label className="flex flex-col gap-1 text-sm">
             <span className="text-zinc-700 dark:text-zinc-300">Credit hours</span>

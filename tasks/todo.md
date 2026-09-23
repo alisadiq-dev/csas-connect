@@ -333,14 +333,14 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
 
 ## Phase 5: Integration, Polish, Deployment
 
-- [ ] **Task 43: Mobile responsiveness pass**
+- [x] **Task 43: Mobile responsiveness pass**
   - Acceptance: Every screen built in Phases 2-4 is usable at phone width (no horizontal scroll, tap targets reasonable) per the original "simple, works on phone and desktop" requirement.
   - Verify: Manual check at common phone viewport widths (e.g. 375px, 414px) for each role's key screens.
   - Dependencies: Phase 4 checkpoint
   - Files: touches existing UI files across `src/app/**`
   - Estimated scope: M (review-and-fix, not new features)
 
-- [ ] **Task 44: End-to-end role journeys**
+- [x] **Task 44: End-to-end role journeys**
   - Acceptance: A full manual (or scripted) run-through per role: admin builds a class/course/offering and enters attendance+results; teacher corrects a record and views their timetable; student views their dashboard, attendance, results, GPA/CGPA, timetable, and notices; CR posts a class notice.
   - Verify: Each journey completes without error against the seeded demo data.
   - Dependencies: Task 43

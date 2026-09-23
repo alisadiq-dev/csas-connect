@@ -17,11 +17,11 @@ export function CrNoticeForm() {
       <div className="flex flex-wrap gap-3">
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Title</span>
-          <input name="title" required className="w-64 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
+          <input name="title" required className="w-full sm:w-64 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Category</span>
-          <input name="category" list="cr-notice-categories" required className="w-48 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
+          <input name="category" list="cr-notice-categories" required className="w-full sm:w-48 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
           <datalist id="cr-notice-categories">
             {SUGGESTED_CATEGORIES.map((c) => (
               <option key={c} value={c} />
@@ -46,7 +46,7 @@ export function CrNoticeForm() {
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Location (optional)</span>
-          <input name="location" className="w-48 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
+          <input name="location" className="w-full sm:w-48 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Attachment (PDF, optional)</span>

@@ -32,7 +32,7 @@ export function SlotForm({
       <input type="hidden" name="classId" value={classId} />
       <label className="flex flex-col gap-1 text-sm">
         <span className="text-zinc-700 dark:text-zinc-300">Course offering</span>
-        <select name="courseOfferingId" required className="w-64 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+        <select name="courseOfferingId" required className="w-full sm:w-64 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
           {offerings.map((o) => (
             <option key={o.id} value={o.id}>
               {o.label}

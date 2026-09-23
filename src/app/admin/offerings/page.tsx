@@ -28,7 +28,7 @@ export default async function OfferingsPage() {
       <form action={createCourseOfferingAction} className="flex flex-wrap items-end gap-3 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Class</span>
-          <select name="classId" required className="w-72 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <select name="classId" required className="w-full sm:w-72 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
             {classes.map((cls) => (
               <option key={cls.id} value={cls.id}>
                 {classLabel(cls)}
@@ -38,7 +38,7 @@ export default async function OfferingsPage() {
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Course</span>
-          <select name="courseId" required className="w-56 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <select name="courseId" required className="w-full sm:w-56 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
             {courses.map((course) => (
               <option key={course.id} value={course.id}>
                 {course.code} — {course.title}

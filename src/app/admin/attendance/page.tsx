@@ -40,7 +40,7 @@ export default async function AdminAttendancePage({
             name="courseOfferingId"
             defaultValue={courseOfferingId ?? ""}
             required
-            className="w-96 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="w-full sm:w-96 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900"
           >
             <option value="" disabled>
               Select a course offering…

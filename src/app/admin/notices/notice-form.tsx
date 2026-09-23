@@ -24,7 +24,7 @@ export function NoticeForm({
       <div className="flex flex-wrap gap-3">
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Title</span>
-          <input name="title" required className="w-64 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
+          <input name="title" required className="w-full sm:w-64 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Category</span>
@@ -32,7 +32,7 @@ export function NoticeForm({
             name="category"
             list="notice-categories"
             required
-            className="w-48 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="w-full sm:w-48 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900"
           />
           <datalist id="notice-categories">
             {SUGGESTED_CATEGORIES.map((c) => (
@@ -56,7 +56,7 @@ export function NoticeForm({
         {scope !== "department" && (
           <label className="flex flex-col gap-1 text-sm">
             <span className="text-zinc-700 dark:text-zinc-300">Program</span>
-            <select name="programId" required className="w-56 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+            <select name="programId" required className="w-full sm:w-56 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
               {programs.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -68,7 +68,7 @@ export function NoticeForm({
         {scope === "class" && (
           <label className="flex flex-col gap-1 text-sm">
             <span className="text-zinc-700 dark:text-zinc-300">Class</span>
-            <select name="classId" required className="w-64 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+            <select name="classId" required className="w-full sm:w-64 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
               {classes.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.label}
@@ -99,7 +99,7 @@ export function NoticeForm({
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Location (optional)</span>
-          <input name="location" className="w-48 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
+          <input name="location" className="w-full sm:w-48 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900" />
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Attachment (PDF, optional)</span>

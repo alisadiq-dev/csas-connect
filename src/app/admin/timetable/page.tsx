@@ -48,7 +48,7 @@ export default async function AdminTimetablePage({
       <form method="GET" className="flex flex-wrap items-end gap-3 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-zinc-700 dark:text-zinc-300">Class</span>
-          <select name="classId" defaultValue={classId ?? ""} required className="w-96 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <select name="classId" defaultValue={classId ?? ""} required className="w-full sm:w-96 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
             <option value="" disabled>
               Select a class…
             </option>

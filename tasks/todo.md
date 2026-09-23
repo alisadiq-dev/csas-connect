@@ -145,42 +145,42 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
 
 ## Phase 4a: `attendance`
 
-- [ ] **Task 18: Schema + RLS migration — attendance_sessions, attendance_records**
+- [x] **Task 18: Schema + RLS migration — attendance_sessions, attendance_records**
   - Acceptance: Tables exist per spec; RLS allows admin full access, teacher `UPDATE`-only (no `INSERT`) scoped to their own course offerings, student `SELECT`-own-only.
   - Verify: RLS integration test covering all three roles, including a teacher `INSERT` attempt that must be denied.
   - Dependencies: Phase 3 checkpoint
   - Files: `src/db/schema/attendance.ts`, `db/migrations/000X_attendance.sql`, `tests/attendance/rls.test.ts`
   - Estimated scope: M
 
-- [ ] **Task 19: `lib/attendance` percentage calculation**
+- [x] **Task 19: `lib/attendance` percentage calculation**
   - Acceptance: `attendancePercentage()` implemented per spec.
   - Verify: Unit tests including zero-sessions and all-leave edge cases.
   - Dependencies: Task 18
   - Files: `src/lib/attendance/percentage.ts`, `tests/attendance/percentage.test.ts`
   - Estimated scope: XS
 
-- [ ] **Task 20: Admin UI — create attendance session**
+- [x] **Task 20: Admin UI — create attendance session**
   - Acceptance: Admin selects a course offering + date, marks every enrolled student present/absent/leave in one screen.
   - Verify: Manual check; smoke test.
   - Dependencies: Task 19
   - Files: `src/app/admin/attendance/*`
   - Estimated scope: M
 
-- [ ] **Task 21: Teacher UI — correct existing records**
+- [x] **Task 21: Teacher UI — correct existing records**
   - Acceptance: Teacher sees sessions for their own course offerings only, can edit a student's status; no "add session" control exists.
   - Verify: Manual check as a seeded teacher account.
   - Dependencies: Task 18, Task 20
   - Files: `src/app/(teacher)/attendance/*`
   - Estimated scope: S
 
-- [ ] **Task 22: Student UI — own attendance view**
+- [x] **Task 22: Student UI — own attendance view**
   - Acceptance: Student sees per-course attendance % and session-by-session detail for their own courses only.
   - Verify: Manual check as a seeded student account; confirm another student's data is unreachable.
   - Dependencies: Task 18
   - Files: `src/app/(student)/attendance/*`
   - Estimated scope: S
 
-- [ ] **Task 23: Seed attendance history**
+- [x] **Task 23: Seed attendance history**
   - Acceptance: Several weeks of realistic attendance data generated for every seeded course offering across all 3 programs.
   - Verify: `npm run db:seed` includes this step without error; spot-check a student's percentage looks realistic (not 100% or 0% everywhere).
   - Dependencies: Task 22

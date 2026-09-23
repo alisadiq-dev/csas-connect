@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { href: "/student", label: "Dashboard" },
   { href: "/student/attendance", label: "Attendance" },
   { href: "/student/results", label: "Results" },
+  { href: "/student/timetable", label: "Timetable" },
 ];
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {

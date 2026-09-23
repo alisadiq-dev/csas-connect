@@ -33,6 +33,12 @@ export async function listAllStudents() {
   return db.select().from(studentProfiles).orderBy(asc(studentProfiles.rollNumber));
 }
 
+/** Looks up one student's own profile (own-lookup during an already-authenticated request; not exposed to arbitrary user input). */
+export async function getStudentByUserId(userId: string) {
+  const [profile] = await db.select().from(studentProfiles).where(eq(studentProfiles.userId, userId));
+  return profile ?? null;
+}
+
 export async function listStudentsForClass(classId: string) {
   return db
     .select()

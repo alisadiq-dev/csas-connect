@@ -233,49 +233,49 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
 
 ## Phase 4c: `timetable`
 
-- [ ] **Task 30: Schema + migration — period_definitions, timetable_slots + RLS**
+- [x] **Task 30: Schema + migration — period_definitions, timetable_slots + RLS**
   - Acceptance: Tables exist per spec; RLS is open-read for authenticated users, admin-only write.
   - Verify: Integration test confirms a non-admin `INSERT` is denied and any authenticated `SELECT` succeeds.
   - Dependencies: Phase 3 checkpoint
   - Files: `src/db/schema/timetable.ts`, `db/migrations/000X_timetable.sql`, `tests/timetable/rls.test.ts`
   - Estimated scope: S
 
-- [ ] **Task 31: `lib/timetable` double-booking validation**
+- [x] **Task 31: `lib/timetable` double-booking validation**
   - Acceptance: `validate.ts` rejects a class double-booked in a slot and a teacher double-booked across two classes/programs in the same slot.
   - Verify: Unit tests for both cases plus a valid non-conflicting case.
   - Dependencies: Task 30
   - Files: `src/lib/timetable/validate.ts`, `tests/timetable/validate.test.ts`
   - Estimated scope: S
 
-- [ ] **Task 32: `lib/timetable` next-lecture logic**
+- [x] **Task 32: `lib/timetable` next-lecture logic**
   - Acceptance: `findNextLecture()` implemented per spec.
   - Verify: Unit tests for "later today," "next teaching day," and "none this week" cases.
   - Dependencies: Task 30
   - Files: `src/lib/timetable/next-lecture.ts`, `tests/timetable/next-lecture.test.ts`
   - Estimated scope: S
 
-- [ ] **Task 33: Admin UI — build weekly timetable**
+- [x] **Task 33: Admin UI — build weekly timetable**
   - Acceptance: Admin assigns course offerings to day/period/room for a class; conflicting assignments are rejected with a clear error (server-side, using Task 31).
   - Verify: Manual check, including attempting a double-booking and confirming rejection.
   - Dependencies: Task 31
   - Files: `src/app/admin/timetable/*`
   - Estimated scope: M
 
-- [ ] **Task 34: Student UI — own class timetable**
+- [x] **Task 34: Student UI — own class timetable**
   - Acceptance: Student sees their own class's weekly grid with assigned teacher per course.
   - Verify: Manual check as a seeded student account.
   - Dependencies: Task 33
   - Files: `src/app/(student)/timetable/*`
   - Estimated scope: S
 
-- [ ] **Task 35: Teacher UI — aggregated schedule + next lecture**
+- [x] **Task 35: Teacher UI — aggregated schedule + next lecture**
   - Acceptance: Teacher sees all their lectures across all programs in one grid, plus a next-lecture summary card (course, program, class, day/time, room).
   - Verify: Manual check as a seeded teacher account with offerings in more than one program.
   - Dependencies: Task 32, Task 33
   - Files: `src/app/(teacher)/timetable/*`
   - Estimated scope: M
 
-- [ ] **Task 36: Seed full weekly timetables**
+- [x] **Task 36: Seed full weekly timetables**
   - Acceptance: All 24 seeded demo classes across 3 programs have a complete 7-period weekly grid with no conflicts.
   - Verify: `npm run db:seed` includes this step and passes the double-booking validation as part of seeding.
   - Dependencies: Task 35

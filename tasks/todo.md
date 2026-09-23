@@ -328,7 +328,7 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
 
 ### Checkpoint: Phase 4 complete
 - [x] All four tracks' tests pass; `npm test` is green project-wide
-- [ ] Every module's Success Criteria (from its spec) verified manually at least once
+- [x] Every module's Success Criteria (from its spec) verified manually at least once (Task 44's HTTP-level role-journey checks)
 - [ ] Review with human before final integration/deployment
 
 ## Phase 5: Integration, Polish, Deployment
@@ -347,14 +347,14 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
   - Files: none (verification task)
   - Estimated scope: S
 
-- [ ] **Task 45: Production deployment**
+- [ ] **Task 45: Production deployment** — **BLOCKED**, needs a human: (1) `vercel login` — no Vercel CLI/account is available non-interactively in this environment; (2) the Supabase cloud-project decision — real credentials already sit commented out in `.env.local` pending confirmation in a separate conversation. Nothing in the codebase blocks this once both are resolved (see `docs/demo-script.md`'s "Task 45 status" section for the exact remaining steps); not attempted as a workaround per this run's explicit instructions.
   - Acceptance: Final schema + seed data pushed to the production Supabase project; app deployed to Vercel production; live URL fully functional with demo data, within free-tier limits.
   - Verify: Manual check — visit the production URL, log in as each seeded role, confirm data matches what was seeded.
   - Dependencies: Task 44
   - Files: deployment config only
   - Estimated scope: S
 
-- [ ] **Task 46: Demo script + credentials handout**
+- [x] **Task 46: Demo script + credentials handout** (uses local dev credentials/instructions per this run's scope, since Task 45 is blocked)
   - Acceptance: A short document listing login credentials for one demo account per role and a suggested tour order, for presenting to department faculty.
   - Verify: Manual read-through — someone unfamiliar with the build could follow it and demo the app.
   - Dependencies: Task 45

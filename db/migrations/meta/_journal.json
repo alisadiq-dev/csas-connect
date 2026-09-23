@@ -15,6 +15,13 @@
       "when": 1790191991989,
       "tag": "0001_academic_structure_offerings",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790192724846,
+      "tag": "0002_identity_rls",
+      "breakpoints": true
     }
   ]
 }

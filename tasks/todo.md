@@ -89,49 +89,49 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
 
 ## Phase 3: `identity`
 
-- [ ] **Task 11: Supabase Auth wiring + admin-API account creation helper**
+- [x] **Task 11: Supabase Auth wiring + admin-API account creation helper**
   - Acceptance: Server-side helper creates a Supabase Auth user (email+password) via the Admin API using the service-role key; no public sign-up route exists anywhere in the app.
   - Verify: Manual check — helper creates a user, confirmed via Supabase dashboard/API.
   - Dependencies: Task 4
   - Files: `src/lib/identity/auth.ts`
   - Estimated scope: S
 
-- [ ] **Task 12: Schema + migration — profile tables and RLS policies**
+- [x] **Task 12: Schema + migration — profile tables and RLS policies**
   - Acceptance: `admin_profiles`, `teacher_profiles`, `student_profiles` exist; RLS policies enforce the rules in `SPEC-identity.md` (student sees own row only, etc.); `course_offerings.teacher_id` upgraded to a real FK.
   - Verify: Integration test — a simulated student Postgres session (using `auth.uid()`) can `SELECT` its own row and is denied on another student's row; **this test must fail before the RLS policy exists and pass after**, proving the policy is doing the work.
   - Dependencies: Task 6, Task 11
   - Files: `src/db/schema/identity.ts`, `db/migrations/000X_identity_rls.sql`, `tests/identity/rls.test.ts`
   - Estimated scope: M
 
-- [ ] **Task 13: Roll number generation**
+- [x] **Task 13: Roll number generation**
   - Acceptance: `generateRollNumber(classId)` returns `{seq}-{yy}` per spec, sequential within a class.
   - Verify: Unit tests covering first-student, nth-student, and cross-class independence.
   - Dependencies: Task 12
   - Files: `src/lib/identity/roll-number.ts`, `tests/identity/roll-number.test.ts`
   - Estimated scope: XS
 
-- [ ] **Task 14: Middleware + `requireRole` helper + login page**
+- [x] **Task 14: Middleware + `requireRole` helper + login page**
   - Acceptance: `middleware.ts` redirects unauthenticated requests to `/login`; `/login` authenticates via Supabase Auth (email+password) and redirects by role; `requireRole()` is the single auth-check helper used everywhere else.
   - Verify: Manual login test with a seeded account (created in Task 17); smoke test on the login form.
   - Dependencies: Task 11, Task 12
   - Files: `src/middleware.ts`, `src/app/login/page.tsx`, `src/lib/identity/require-role.ts`
   - Estimated scope: M
 
-- [ ] **Task 15: Admin UI — create teacher account**
+- [x] **Task 15: Admin UI — create teacher account**
   - Acceptance: Admin creates a teacher (email + password + name); teacher can immediately log in.
   - Verify: Manual check — create then log in as that teacher.
   - Dependencies: Task 14
   - Files: `src/app/admin/teachers/*`
   - Estimated scope: S
 
-- [ ] **Task 16: Admin UI — create student account**
+- [x] **Task 16: Admin UI — create student account**
   - Acceptance: Admin picks a class, system generates the roll number, admin sets email+password, optionally flags the student as CR; student can immediately log in.
   - Verify: Manual check — create then log in as that student.
   - Dependencies: Task 13, Task 14
   - Files: `src/app/admin/students/*`
   - Estimated scope: S
 
-- [ ] **Task 17: Seed demo accounts across all 3 programs**
+- [x] **Task 17: Seed demo accounts across all 3 programs**
   - Acceptance: Seed script creates working login credentials for a handful of students (incl. at least one CR) per seeded class, and a teacher per seeded course offering, across all 3 programs from `academic-structure`'s seed.
   - Verify: `npm run db:seed:auth` runs clean; spot-check login for one account per role.
   - Dependencies: Task 10, Task 16
@@ -139,8 +139,8 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
   - Estimated scope: M
 
 ### Checkpoint: `identity`
-- [ ] RLS integration test proves database-level access control, not just UI hiding
-- [ ] Every role can log in with a seeded account and reach a (still mostly empty) role-appropriate dashboard shell
+- [x] RLS integration test proves database-level access control, not just UI hiding
+- [x] Every role can log in with a seeded account and reach a (still mostly empty) role-appropriate dashboard shell
 - [ ] Review with human before starting the parallel Phase 4 tracks
 
 ## Phase 4a: `attendance`

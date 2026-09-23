@@ -8,6 +8,7 @@ import {
   unique,
   uuid,
 } from "drizzle-orm/pg-core";
+import { teacherProfiles } from "./identity.ts";
 
 // See SPEC-academic-structure.md for the full data model this file backs.
 // `course_offerings` is the join point every other module (attendance,
@@ -91,9 +92,10 @@ export const courseOfferings = pgTable(
     termId: uuid("term_id")
       .notNull()
       .references(() => academicTerms.id),
-    // Nullable placeholder until the `identity` module ships; Task 12
-    // upgrades this to a real FK -> teacher_profiles.user_id.
-    teacherId: uuid("teacher_id"),
+    // Upgraded in Task 12 from a nullable placeholder to a real FK once
+    // `identity` ships teacher_profiles. Still nullable — an offering can
+    // exist before a teacher is assigned to it.
+    teacherId: uuid("teacher_id").references(() => teacherProfiles.userId),
     // Denormalized: preserves the class's semester at time of offering, so
     // history stays correct after the class advances semesters.
     semesterNumber: integer("semester_number").notNull(),

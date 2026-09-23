@@ -43,6 +43,13 @@
       "when": 1790196071243,
       "tag": "0005_timetable",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790196502870,
+      "tag": "0006_notices_events",
+      "breakpoints": true
     }
   ]
 }

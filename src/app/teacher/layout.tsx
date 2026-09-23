@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { href: "/teacher/attendance", label: "Attendance" },
   { href: "/teacher/results", label: "Results" },
   { href: "/teacher/timetable", label: "Timetable" },
+  { href: "/notices", label: "Notices" },
 ];
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {

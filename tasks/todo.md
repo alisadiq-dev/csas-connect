@@ -284,42 +284,42 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
 
 ## Phase 4d: `notices-events`
 
-- [ ] **Task 37: Schema + RLS migration — notices_events, notice_attachments + Storage bucket**
+- [x] **Task 37: Schema + RLS migration — notices_events, notice_attachments + Storage bucket**
   - Acceptance: Tables exist per spec; a Supabase Storage bucket is configured for PDF attachments; RLS enforces admin full access, CR scoped to own-class-only writes, and the department/program/class visibility rule for reads.
   - Verify: RLS integration test — CR can insert for own class, denied for another class or department/program scope.
   - Dependencies: Phase 3 checkpoint
   - Files: `src/db/schema/notices-events.ts`, `db/migrations/000X_notices_events.sql`, `tests/notices-events/rls.test.ts`
   - Estimated scope: M
 
-- [ ] **Task 38: `lib/notices` visibility rule**
+- [x] **Task 38: `lib/notices` visibility rule**
   - Acceptance: `visibleTo()` implemented per spec, covering department/program/class scopes.
   - Verify: Unit tests for all 3 scopes × student/teacher/CR viewer combinations.
   - Dependencies: Task 37
   - Files: `src/lib/notices/visibility.ts`, `tests/notices-events/visibility.test.ts`
   - Estimated scope: S
 
-- [ ] **Task 39: Admin UI — full CRUD + PDF upload + audience targeting**
+- [x] **Task 39: Admin UI — full CRUD + PDF upload + audience targeting**
   - Acceptance: Admin creates a notice/event with a category, audience scope, and optional PDF attachment (date sheet or result PDF), with program/class/semester labeling metadata.
   - Verify: Manual check, including a PDF upload round-trip.
   - Dependencies: Task 38
   - Files: `src/app/admin/notices/*`
   - Estimated scope: M
 
-- [ ] **Task 40: CR UI — own-class notices/events**
+- [x] **Task 40: CR UI — own-class notices/events**
   - Acceptance: CR creates/edits/deletes notices/events scoped to their own class only; attempting another scope is rejected (relies on Task 37's RLS).
   - Verify: Manual check as a seeded CR account.
   - Dependencies: Task 37, Task 39
   - Files: `src/app/(cr)/notices/*`
   - Estimated scope: S
 
-- [ ] **Task 41: Shared read view — notices/events feed**
+- [x] **Task 41: Shared read view — notices/events feed**
   - Acceptance: Every role sees a combined notices+events feed filtered by the visibility rule; events display date/time/location/description distinctly from notices within the same section.
   - Verify: Manual check across student/teacher/CR/admin accounts.
   - Dependencies: Task 38
   - Files: `src/app/notices/*`
   - Estimated scope: M
 
-- [ ] **Task 42: Seed realistic notices/events mix**
+- [x] **Task 42: Seed realistic notices/events mix**
   - Acceptance: A few department-wide notices, one date sheet PDF, one result PDF, a couple of class-specific notices, and at least one upcoming event are seeded.
   - Verify: `npm run db:seed` includes this step; manual check that PDFs are viewable from the seeded records.
   - Dependencies: Task 41
@@ -327,7 +327,7 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
   - Estimated scope: S
 
 ### Checkpoint: Phase 4 complete
-- [ ] All four tracks' tests pass; `npm test` is green project-wide
+- [x] All four tracks' tests pass; `npm test` is green project-wide
 - [ ] Every module's Success Criteria (from its spec) verified manually at least once
 - [ ] Review with human before final integration/deployment
 

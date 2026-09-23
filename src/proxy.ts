@@ -12,7 +12,7 @@ import { SESSION_COOKIE_NAME } from "@/lib/identity/session-cookie-name";
 // motivated the split under the old `middleware` convention no longer
 // strictly applies) — requireRole() stays the single source of truth for
 // auth either way.
-const PROTECTED_PREFIXES = ["/admin", "/teacher", "/student"];
+const PROTECTED_PREFIXES = ["/admin", "/teacher", "/student", "/cr", "/notices"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -28,5 +28,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/teacher/:path*", "/student/:path*"],
+  matcher: ["/admin/:path*", "/teacher/:path*", "/student/:path*", "/cr/:path*", "/notices/:path*"],
 };

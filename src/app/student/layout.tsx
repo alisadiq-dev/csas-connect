@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/identity/require-role";
+import { getStudentByUserId } from "@/lib/identity/students";
 
 const NAV_ITEMS = [
   { href: "/student", label: "Dashboard" },
   { href: "/student/attendance", label: "Attendance" },
   { href: "/student/results", label: "Results" },
   { href: "/student/timetable", label: "Timetable" },
+  { href: "/notices", label: "Notices" },
 ];
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
-  await requireRole("student");
+  const session = await requireRole("student");
+  const profile = await getStudentByUserId(session.userId);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
@@ -29,6 +32,11 @@ export default async function StudentLayout({ children }: { children: React.Reac
                   {item.label}
                 </Link>
               ))}
+              {profile?.isClassRep && (
+                <Link href="/cr/notices" className="font-medium text-blue-700 hover:underline dark:text-blue-400">
+                  Class Rep area
+                </Link>
+              )}
             </nav>
           </div>
           <form action="/logout" method="post">

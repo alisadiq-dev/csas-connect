@@ -6,8 +6,10 @@ Departmental portal for the University of the Punjab's Statistics department (BS
 
 ```bash
 npm install
-npm run db:local:start   # starts an isolated Postgres instance for this project (first run initializes it)
-npm run db:migrate       # applies migrations to the local dev + test databases
+npm run db:local:start   # starts an isolated Postgres instance for this project (first run initializes it; safe to call anytime)
+npm run db:migrate       # applies migrations to the local dev database
+npm run db:seed          # seeds academic-structure demo data (3 programs, 24 classes, courses, Fall 2026 offerings)
+npm run db:seed:auth     # seeds identity demo accounts (admin, teachers, students) — run after db:seed
 npm run dev               # http://localhost:3000
 ```
 
@@ -20,6 +22,12 @@ npm run db:local:stop     # stops the local Postgres instance
 npm run db:local:status   # checks whether it's running
 npm run db:studio         # opens Drizzle Studio against the local dev database
 ```
+
+Demo login credentials after seeding (local dev only — see "Local auth shim" below): `admin@csas-connect.local` / `AdminPass123!`, `teacher.<program-code>.<1-4>@csas-connect.local` / `TeacherPass123!` (program codes: `stat`, `biostat`, `cs`), and any seeded student (`select email from auth.users` after seeding, or query `student_profiles` for a roll number and reconstruct `student.<roll-number>.<class-id-prefix>@csas-connect.local`) / `StudentPass123!`. Both seed scripts are idempotent — safe to re-run, they skip if already seeded.
+
+### Local auth shim (RLS testing without a real Supabase project)
+
+No cloud Supabase project is connected yet (see "Cloud setup" below), but Row-Level Security still needs to be tested against real Postgres. `scripts/local-auth-shim.sql` (applied automatically by `npm run db:local:start`, never part of `db/migrations/`) makes the local dev/test databases provide `auth.users`, `auth.uid()`, and the `authenticated` role the same way real Supabase-hosted Postgres does, plus a local-only `auth.local_credentials` table so `/login` can verify passwords without a real GoTrue server running. `src/lib/db/with-user.ts` (`withUserDb`) is the only code path that should run student/teacher/CR-scoped queries — it drops the Postgres session to the `authenticated` role and sets `auth.uid()` inside a transaction, exactly like Supabase's PostgREST does, so nothing here needs to change once a real project exists.
 
 The local Postgres instance is dedicated to this project only — separate data directory (`~/.csas-connect-devdb`, deliberately kept outside the repo so Next.js's build tooling doesn't scan its socket file), separate port (54329), trust-auth, loopback-only. It never touches any other Postgres install on your machine. Connection details are in `.env.local` (gitignored).
 

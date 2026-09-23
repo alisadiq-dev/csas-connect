@@ -34,7 +34,14 @@ beforeAll(async () => {
     .insert(programs)
     .values({ name: "RLS test program", code: `RLS-${Date.now()}` })
     .returning();
-  const [batch] = await testDb.insert(batches).values({ programId: program.id, intakeYear: 2024 }).returning();
+  // A randomized, unlikely-to-collide intake year: student_profiles.roll_number
+  // generation (Task 13) scopes its sequence by intake year GLOBALLY across
+  // the whole database (see src/lib/identity/roll-number.ts), and vitest
+  // runs test files in parallel by default — a hardcoded year here
+  // previously collided with tests/identity/roll-number.test.ts's own
+  // fixtures running concurrently in another file.
+  const intakeYear = 200_000 + Math.floor(Math.random() * 100_000);
+  const [batch] = await testDb.insert(batches).values({ programId: program.id, intakeYear }).returning();
   const [cls] = await testDb
     .insert(classes)
     .values({ batchId: batch.id, sectionType: "regular", currentSemester: 1 })

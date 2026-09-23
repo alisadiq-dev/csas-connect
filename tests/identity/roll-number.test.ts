@@ -49,9 +49,10 @@ async function makeStudent(classId: string, rollNumber: string) {
 
 describe("generateRollNumber (Task 13)", () => {
   it("first student in a class gets sequence 1", async () => {
-    const cls = await makeClass(2024);
+    const year = nextYear();
+    const cls = await makeClass(year);
     const rollNumber = await generateRollNumber(cls.id);
-    expect(rollNumber).toBe("1-24");
+    expect(rollNumber).toBe(`1-${(year % 100).toString().padStart(2, "0")}`);
   });
 
   it("the nth student gets sequence n", async () => {
@@ -64,18 +65,22 @@ describe("generateRollNumber (Task 13)", () => {
   });
 
   it("formats single-digit intake years as two digits (YY padding)", async () => {
-    const cls = await makeClass(2005);
+    // Unique-per-run year whose last two digits are deliberately "05".
+    const year = nextYear() * 100 + 5;
+    const cls = await makeClass(year);
     const rollNumber = await generateRollNumber(cls.id);
     expect(rollNumber).toBe("1-05");
   });
 
   it("a different intake year starts its own sequence at 1, independent of other years", async () => {
-    const cls2030 = await makeClass(2030);
-    await makeStudent(cls2030.id, `seed-2030-${cls2030.id}`);
+    const yearA = nextYear();
+    const clsA = await makeClass(yearA);
+    await makeStudent(clsA.id, `seed-a-${clsA.id}`);
 
-    const clsOtherYear = await makeClass(2031);
-    const rollNumber = await generateRollNumber(clsOtherYear.id);
-    expect(rollNumber).toBe("1-31");
+    const yearB = nextYear();
+    const clsB = await makeClass(yearB);
+    const rollNumber = await generateRollNumber(clsB.id);
+    expect(rollNumber).toBe(`1-${(yearB % 100).toString().padStart(2, "0")}`);
   });
 
   it("two classes sharing an intake year (e.g. Regular + Replica of the same batch, or two programs' batches admitted the same year) do NOT collide — this is the exact bug generateRollNumber must avoid, since student_profiles.roll_number has a GLOBAL unique constraint", async () => {

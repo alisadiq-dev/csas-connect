@@ -45,8 +45,9 @@ Local dev works without any cloud account. To deploy to a live, shareable URL, y
   NEXT_PUBLIC_SUPABASE_URL=...
   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
   SUPABASE_SERVICE_ROLE_KEY=...
-  DATABASE_URL=<the Supabase Postgres connection string, for Drizzle migrations>
+  SUPABASE_DATABASE_URL=<the Supabase Postgres connection string, for one-time migrate/seed only>
   ```
+  Note `SUPABASE_DATABASE_URL` is deliberately separate from `DATABASE_URL`/`DATABASE_URL_TEST` — those two keep pointing at the local Postgres instance for day-to-day `npm run dev`/`npm test`, so adding cloud credentials doesn't change local development at all. `SUPABASE_DATABASE_URL` is only used for the explicit one-time commands that migrate/seed the real cloud database (see below), and for Vercel's own environment variables at deploy time (set separately, in Vercel's dashboard, not from this file).
 
 **2. Deploy to Vercel** (free tier)
 - Install the CLI (`npm install -g vercel`, or use `npx vercel`) and run `vercel login` yourself in a real terminal — it opens a browser for authentication.

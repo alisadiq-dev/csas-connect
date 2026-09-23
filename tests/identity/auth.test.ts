@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { afterAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { testDb } from "../db";
 
 vi.mock("@/db", async () => {
@@ -18,8 +18,22 @@ afterAll(async () => {
   }
 });
 
+// This suite tests the LOCAL fallback path specifically, which only exists
+// while no real Supabase project is configured. Whatever real deployment
+// credentials .env.local happens to carry (e.g. once a cloud project is
+// connected) must not change what this suite exercises — stub the cloud env
+// vars to unset for every test here, restoring the real values afterward.
+beforeEach(() => {
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
+  vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "");
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
+
 describe("lib/identity/auth (Task 11)", () => {
-  it("isRealSupabaseConfigured is false without cloud env vars (this environment's actual state)", () => {
+  it("isRealSupabaseConfigured is false without cloud env vars", () => {
     expect(isRealSupabaseConfigured()).toBe(false);
   });
 

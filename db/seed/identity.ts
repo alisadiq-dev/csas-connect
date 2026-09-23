@@ -63,6 +63,7 @@ async function main() {
   let teacherSeedIndex = 0;
   let totalTeachers = 0;
   let totalOfferingsAssigned = 0;
+  const firstTeacherIdByProgram = new Map<string, string>();
 
   for (const program of allPrograms) {
     const programTeacherIds: string[] = [];
@@ -75,6 +76,7 @@ async function main() {
       teacherSeedIndex++;
       totalTeachers++;
     }
+    firstTeacherIdByProgram.set(program.id, programTeacherIds[0]);
 
     // All offerings for classes belonging to this program.
     const programClasses = await db
@@ -101,6 +103,38 @@ async function main() {
     }
   }
   console.log(`Created ${totalTeachers} teacher accounts; assigned teachers to ${totalOfferingsAssigned} course offerings.`);
+
+  // --- Cross-program teacher (Task 35's demo requirement): assign the
+  // first program's first teacher to one additional offering in the SECOND
+  // program too, so at least one seeded teacher account genuinely has
+  // course offerings in more than one program — the per-program round-robin
+  // above never produces this on its own (each pool is scoped to a single
+  // program), and SPEC-timetable.md's teacher view ("aggregated schedule
+  // across all their course offerings, regardless of program") needs at
+  // least one real example to demo. Doesn't affect the round-robin's own
+  // per-program coverage guarantee (that offering keeps a valid teacher —
+  // it's simply reassigned to a second one).
+  if (allPrograms.length >= 2) {
+    const crossTeacherId = firstTeacherIdByProgram.get(allPrograms[0].id);
+    const secondProgram = allPrograms[1];
+    const secondProgramClasses = await db
+      .select({ id: classes.id })
+      .from(classes)
+      .innerJoin(batches, eq(classes.batchId, batches.id))
+      .where(eq(batches.programId, secondProgram.id));
+    const secondProgramClassIds = secondProgramClasses.map((c) => c.id);
+    if (crossTeacherId && secondProgramClassIds.length > 0) {
+      const [targetOffering] = await db
+        .select({ id: courseOfferings.id })
+        .from(courseOfferings)
+        .where(inArray(courseOfferings.classId, secondProgramClassIds))
+        .limit(1);
+      if (targetOffering) {
+        await db.update(courseOfferings).set({ teacherId: crossTeacherId }).where(eq(courseOfferings.id, targetOffering.id));
+        console.log(`Assigned a cross-program teacher: one ${secondProgram.code} offering now belongs to a ${allPrograms[0].code} teacher, for the aggregated teacher timetable demo.`);
+      }
+    }
+  }
 
   // --- Students: a handful per class, first one flagged as CR ---
   const STUDENTS_PER_CLASS = 4;

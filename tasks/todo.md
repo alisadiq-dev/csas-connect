@@ -347,14 +347,14 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
   - Files: none (verification task)
   - Estimated scope: S
 
-- [ ] **Task 45: Production deployment** — **BLOCKED**, needs a human: (1) `vercel login` — no Vercel CLI/account is available non-interactively in this environment; (2) the Supabase cloud-project decision — real credentials already sit commented out in `.env.local` pending confirmation in a separate conversation. Nothing in the codebase blocks this once both are resolved (see `docs/demo-script.md`'s "Task 45 status" section for the exact remaining steps); not attempted as a workaround per this run's explicit instructions.
-  - Acceptance: Final schema + seed data pushed to the production Supabase project; app deployed to Vercel production; live URL fully functional with demo data, within free-tier limits.
-  - Verify: Manual check — visit the production URL, log in as each seeded role, confirm data matches what was seeded.
+- [x] **Task 45: Production deployment** — completed once the human confirmed the Supabase project and ran `vercel login`. Migrations applied to the real Supabase project; a real RLS default-deny bug was found and fixed there (see `db/migrations/0007_academic_structure_read_policies.sql`) before seeding; fictional demo data seeded to the cloud DB (checked it was empty first, per instruction, before writing anything); deployed to Vercel production at **https://csas-connect.vercel.app**.
+  - Acceptance: Final schema + seed data pushed to the production Supabase project; app deployed to Vercel production; live URL fully functional with demo data, within free-tier limits. — Met.
+  - Verify: Real HTTP requests against the live URL (not assumptions): homepage 200; unauthenticated `/admin` and `/student` redirect to `/login`; a genuine form POST (replicating the no-JS server-action fallback encoding) logging in as the real seeded admin succeeds and reaches `/admin` (200, real dashboard content); the same for a real seeded student, reaching `/student` and `/student/results` with real computed GPA/grade data rendered; an admin session requesting `/student` is redirected back to `/admin` (role-gating, not just login-gating).
   - Dependencies: Task 44
-  - Files: deployment config only
-  - Estimated scope: S
+  - Files: `db/migrations/0007_academic_structure_read_policies.sql`, `db/migrations/meta/_journal.json`, `tests/identity/auth.test.ts`, `src/app/login/actions.ts` (reverted an untested fallback), Vercel project config (env vars, no repo files)
+  - Estimated scope: S (grew to M once the RLS bug was found)
 
-- [x] **Task 46: Demo script + credentials handout** (uses local dev credentials/instructions per this run's scope, since Task 45 is blocked)
+- [x] **Task 46: Demo script + credentials handout** — updated with the live production URL (see `docs/demo-script.md`).
   - Acceptance: A short document listing login credentials for one demo account per role and a suggested tour order, for presenting to department faculty.
   - Verify: Manual read-through — someone unfamiliar with the build could follow it and demo the app.
   - Dependencies: Task 45
@@ -362,5 +362,5 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
   - Estimated scope: XS
 
 ### Checkpoint: Complete
-- [ ] All acceptance criteria across all 46 tasks met
-- [ ] Live production URL ready to present
+- [x] All acceptance criteria across all 46 tasks met
+- [x] Live production URL ready to present — https://csas-connect.vercel.app

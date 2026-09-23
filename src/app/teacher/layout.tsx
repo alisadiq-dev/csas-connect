@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/identity/require-role";
 const NAV_ITEMS = [
   { href: "/teacher", label: "Dashboard" },
   { href: "/teacher/attendance", label: "Attendance" },
+  { href: "/teacher/results", label: "Results" },
 ];
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {

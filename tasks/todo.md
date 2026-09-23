@@ -189,42 +189,42 @@ Full checklist backing `tasks/plan.md`. Tasks are ordered by dependency; Phase 4
 
 ## Phase 4b: `results`
 
-- [ ] **Task 24: Schema + RLS migration — grading_scale, results**
+- [x] **Task 24: Schema + RLS migration — grading_scale, results**
   - Acceptance: Tables exist per spec (including `special_status`); RLS matches the `attendance` pattern (admin full, teacher update-own-only, student select-own-only).
   - Verify: RLS integration test; seed `grading_scale` from the confirmed PU table as part of this task's migration.
   - Dependencies: Phase 3 checkpoint
   - Files: `src/db/schema/results.ts`, `db/migrations/000X_results.sql`, `tests/results/rls.test.ts`
   - Estimated scope: M
 
-- [ ] **Task 25: `lib/results` grading + GPA/CGPA engine**
+- [x] **Task 25: `lib/results` grading + GPA/CGPA engine**
   - Acceptance: `grading.ts` (percent→letter/points lookup) and `gpa.ts` (`computeGpa`) implemented per spec, including fractional-mark rounding and `special_status` exclusion.
   - Verify: Unit tests reproduce the two official worked examples (GPA 2.45, GPA 2.94) exactly; rounding test (64.1/64.9→65); exclusion test for W/FW/I.
   - Dependencies: Task 24
   - Files: `src/lib/results/grading.ts`, `src/lib/results/gpa.ts`, `tests/results/gpa.test.ts`
   - Estimated scope: M
 
-- [ ] **Task 26: Admin UI — enter results**
+- [x] **Task 26: Admin UI — enter results**
   - Acceptance: Admin selects a course offering, enters sessional/mid/final marks (or a special status) per enrolled student; total/letter/points compute automatically.
   - Verify: Manual check; smoke test.
   - Dependencies: Task 25
   - Files: `src/app/admin/results/*`
   - Estimated scope: M
 
-- [ ] **Task 27: Teacher UI — correct existing results**
+- [x] **Task 27: Teacher UI — correct existing results**
   - Acceptance: Teacher edits existing results for their own course offerings only; no "add result" control.
   - Verify: Manual check as a seeded teacher account.
   - Dependencies: Task 24, Task 26
   - Files: `src/app/(teacher)/results/*`
   - Estimated scope: S
 
-- [ ] **Task 28: Student UI — own results, semester GPA, CGPA**
+- [x] **Task 28: Student UI — own results, semester GPA, CGPA**
   - Acceptance: Student sees per-course results, current-semester GPA, and CGPA for their own account only.
   - Verify: Manual check as a seeded student account; confirm computed GPA matches a hand-calculated expectation for that student's seeded results.
   - Dependencies: Task 24
   - Files: `src/app/(student)/results/*`
   - Estimated scope: S
 
-- [ ] **Task 29: Seed realistic, varied results**
+- [x] **Task 29: Seed realistic, varied results**
   - Acceptance: Results generated for seeded course offerings across all 3 programs with varied grades (not uniform), so GPA/CGPA differ meaningfully across demo students.
   - Verify: `npm run db:seed` includes this step; spot-check GPA variance across a few seeded students.
   - Dependencies: Task 28

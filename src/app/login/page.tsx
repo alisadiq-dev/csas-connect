@@ -1,6 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
+import { Logo } from "@/components/brand/Logo";
+import { AlertIcon } from "@/components/icons";
 import { loginAction, type LoginState } from "./actions";
 
 const initialState: LoginState = { error: null };
@@ -9,54 +11,85 @@ export default function LoginPage() {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 dark:bg-black">
-      <form
-        action={formAction}
-        className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950"
-      >
-        <div>
-          <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">CSAS Connect</h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Sign in with the email and password your administrator gave you.
+    <div className="flex min-h-screen bg-slate-50">
+      <div className="relative hidden flex-1 flex-col justify-between overflow-hidden bg-indigo-700 p-10 text-white lg:flex">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 60% 70%, white 1px, transparent 1px)",
+            backgroundSize: "34px 34px",
+          }}
+        />
+        <Logo size="lg" tone="dark" />
+        <div className="max-w-sm">
+          <h1 className="text-3xl font-semibold tracking-tight">A single home for CSAS academic records.</h1>
+          <p className="mt-3 text-sm leading-relaxed text-indigo-100">
+            Attendance, results, GPA/CGPA and timetables for BS Statistics, BS Biostatistics and BS Computational
+            Statistics — Regular and Replica sections — in one portal for students, teachers and administrators.
           </p>
         </div>
+        <p className="text-xs text-indigo-200">University of the Punjab · College of Statistical &amp; Actuarial Sciences</p>
+      </div>
 
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-zinc-700 dark:text-zinc-300">Email</span>
-          <input
-            name="email"
-            type="email"
-            required
-            autoComplete="username"
-            className="rounded border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-          />
-        </label>
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-10 sm:px-6">
+        <div className="w-full max-w-sm">
+          <div className="mb-8 flex justify-center lg:hidden">
+            <Logo size="md" />
+          </div>
 
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-zinc-700 dark:text-zinc-300">Password</span>
-          <input
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-            className="rounded border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-          />
-        </label>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-lg font-semibold text-slate-900">Sign in</h2>
+            <p className="mt-1 text-sm text-slate-500">Use the email and password your administrator gave you.</p>
 
-        {state.error && (
-          <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-400">
-            {state.error}
+            <form action={formAction} className="mt-6 flex flex-col gap-4">
+              <label className="flex flex-col gap-1.5 text-sm">
+                <span className="font-medium text-slate-700">Email</span>
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="username"
+                  className="rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  placeholder="you@csas-connect.local"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1.5 text-sm">
+                <span className="font-medium text-slate-700">Password</span>
+                <input
+                  name="password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  className="rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  placeholder="••••••••"
+                />
+              </label>
+
+              {state.error && (
+                <p role="alert" className="flex items-start gap-2 rounded-lg bg-rose-50 px-3 py-2.5 text-sm text-rose-700">
+                  <AlertIcon className="mt-0.5 h-4 w-4 shrink-0" />
+                  {state.error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={pending}
+                className="mt-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500/30 disabled:opacity-60"
+              >
+                {pending ? "Signing in…" : "Sign in"}
+              </button>
+            </form>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-slate-400">
+            Unofficial student-built demo — not an official University of the Punjab system.
           </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900"
-        >
-          {pending ? "Signing in…" : "Sign in"}
-        </button>
-      </form>
+        </div>
+      </div>
     </div>
   );
 }

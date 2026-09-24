@@ -1,45 +1,31 @@
-import Link from "next/link";
+import { AppShell } from "@/components/layout/AppShell";
+import type { NavSection } from "@/components/layout/nav-types";
 import { requireRole } from "@/lib/identity/require-role";
+import { getTeacherByUserId } from "@/lib/identity/teachers";
 
-const NAV_ITEMS = [
-  { href: "/teacher", label: "Dashboard" },
-  { href: "/teacher/attendance", label: "Attendance" },
-  { href: "/teacher/results", label: "Results" },
-  { href: "/teacher/timetable", label: "Timetable" },
-  { href: "/notices", label: "Notices" },
+const NAV_SECTIONS: NavSection[] = [
+  {
+    label: "Main",
+    items: [
+      { href: "/teacher", label: "Dashboard", icon: "dashboard" },
+      { href: "/teacher/attendance", label: "Attendance", icon: "attendance" },
+      { href: "/teacher/results", label: "Results", icon: "results" },
+      { href: "/teacher/timetable", label: "Timetable", icon: "timetable" },
+    ],
+  },
+  {
+    label: "Community",
+    items: [{ href: "/notices", label: "Notices & Events", icon: "notices" }],
+  },
 ];
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
-  await requireRole("teacher");
+  const session = await requireRole("teacher");
+  const profile = await getTeacherByUserId(session.userId);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-4 sm:px-6">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-              CSAS Connect · Teacher
-            </span>
-            <nav className="flex flex-wrap gap-4 text-sm">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          <form action="/logout" method="post">
-            <button type="submit" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50">
-              Log out
-            </button>
-          </form>
-        </div>
-      </header>
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">{children}</main>
-    </div>
+    <AppShell roleLabel="Teacher" userName={profile?.fullName ?? "Teacher"} navSections={NAV_SECTIONS}>
+      {children}
+    </AppShell>
   );
 }

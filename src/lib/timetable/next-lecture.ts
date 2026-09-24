@@ -12,7 +12,7 @@ export type TimetableSlotWithTime = {
   room: string | null;
 };
 
-function jsDayToDayOfWeek(jsDay: number): DayOfWeekEnum | null {
+export function jsDayToDayOfWeek(jsDay: number): DayOfWeekEnum | null {
   // Date.getDay(): 0 = Sunday, 1 = Monday, ... 6 = Saturday. No Sunday
   // teaching day exists in this department's schedule.
   const map: (DayOfWeekEnum | null)[] = [null, "mon", "tue", "wed", "thu", "fri", "sat"];

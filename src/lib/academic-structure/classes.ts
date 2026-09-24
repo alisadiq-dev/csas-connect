@@ -34,6 +34,26 @@ export async function listAllClassesWithContext() {
     .orderBy(asc(programs.name), asc(batches.intakeYear), asc(classes.sectionType));
 }
 
+/** Same context as listAllClassesWithContext, scoped to one class — for a student/CR's own identity strip. */
+export async function getClassWithContext(classId: string) {
+  const [row] = await db
+    .select({
+      id: classes.id,
+      sectionType: classes.sectionType,
+      currentSemester: classes.currentSemester,
+      batchId: classes.batchId,
+      intakeYear: batches.intakeYear,
+      programId: programs.id,
+      programName: programs.name,
+      programCode: programs.code,
+    })
+    .from(classes)
+    .innerJoin(batches, eq(classes.batchId, batches.id))
+    .innerJoin(programs, eq(batches.programId, programs.id))
+    .where(eq(classes.id, classId));
+  return row ?? null;
+}
+
 export async function advanceClassSemester(classId: string, newSemester: number) {
   const [updated] = await db
     .update(classes)

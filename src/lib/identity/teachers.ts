@@ -1,4 +1,4 @@
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { teacherProfiles } from "@/db/schema/identity";
 import { createAuthUser } from "./auth";
@@ -16,4 +16,10 @@ export async function createTeacher(input: { email: string; password: string; fu
 
 export async function listTeachers() {
   return db.select().from(teacherProfiles).orderBy(asc(teacherProfiles.fullName));
+}
+
+/** Looks up one teacher's own profile (own-lookup during an already-authenticated request). */
+export async function getTeacherByUserId(userId: string) {
+  const [profile] = await db.select().from(teacherProfiles).where(eq(teacherProfiles.userId, userId));
+  return profile ?? null;
 }

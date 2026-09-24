@@ -20,23 +20,27 @@ function todayDayOfWeek(): DayOfWeekEnum {
 }
 
 type Period = { periodNumber: number; startTime: string; endTime: string };
-type BaseSlot = { dayOfWeek: DayOfWeekEnum; periodNumber: number };
+// `content` is pre-rendered JSX, computed server-side by the caller — NOT a
+// render-prop function. WeeklyGrid is a Client Component (it needs
+// useState for the mobile day tabs), and functions can't cross the
+// Server->Client Component boundary as props, only serializable data
+// (including already-rendered React elements) can.
+type BaseSlot = { dayOfWeek: DayOfWeekEnum; periodNumber: number; content: ReactNode };
 
 /**
  * A full weekly timetable grid: a table on desktop, a day-by-day list on
  * mobile (viewports too narrow for a 7-column grid to stay readable).
- * `renderCell` renders one slot's content — the caller decides what fields
- * to show (course only, course+teacher, course+delete action, etc.).
+ * Each slot carries its own pre-rendered `content` — the caller decides
+ * what fields to show (course only, course+teacher, course+delete action,
+ * etc.) before passing slots in.
  */
 export function WeeklyGrid<T extends BaseSlot>({
   periods,
   slots,
-  renderCell,
   emptyCell = <span className="text-xs text-slate-300">—</span>,
 }: {
   periods: Period[];
   slots: T[];
-  renderCell: (slot: T) => ReactNode;
   emptyCell?: ReactNode;
 }) {
   const [mobileDay, setMobileDay] = useState<DayOfWeekEnum>(todayDayOfWeek());
@@ -69,7 +73,7 @@ export function WeeklyGrid<T extends BaseSlot>({
                   const slot = byDayPeriod.get(`${d.value}-${p.periodNumber}`);
                   return (
                     <td key={d.value} className="p-3 align-top">
-                      {slot ? renderCell(slot) : emptyCell}
+                      {slot ? slot.content : emptyCell}
                     </td>
                   );
                 })}
@@ -103,7 +107,7 @@ export function WeeklyGrid<T extends BaseSlot>({
             return (
               <li key={p.periodNumber} className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3 text-sm">
                 <span className="w-20 shrink-0 text-xs font-medium text-slate-500">{formatTime(p.startTime)}</span>
-                <div className="min-w-0 flex-1">{slot ? renderCell(slot) : <span className="text-xs text-slate-400">Free period</span>}</div>
+                <div className="min-w-0 flex-1">{slot ? slot.content : <span className="text-xs text-slate-400">Free period</span>}</div>
               </li>
             );
           })}

@@ -1,5 +1,9 @@
 import { requireAnySession } from "@/lib/identity/require-role";
 import { listAttachmentsForNotices, listVisibleNotices } from "@/lib/notices/feed";
+import { Card, CardBody } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { CalendarCheckIcon, BellIcon, DocumentIcon } from "@/components/icons";
 
 /**
  * Shared read view for every role, filtered by the visibility rule at the
@@ -22,61 +26,98 @@ export default async function NoticesFeedPage() {
   const events = notices.filter((n) => n.eventStartAt !== null);
   const plainNotices = notices.filter((n) => n.eventStartAt === null);
 
+  const scopeLabel = (scope: (typeof notices)[number]["audienceScope"]) => {
+    if (scope === "department") return "Department-wide";
+    if (scope === "program") return "Program";
+    return "Class";
+  };
+
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
+    <div className="min-h-screen bg-slate-50">
       <main className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-8 sm:px-6">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Notices &amp; Events</h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <h1 className="text-xl font-semibold text-slate-900">Notices &amp; Events</h1>
+          <p className="mt-1 text-sm text-slate-500">
             Everything relevant to you — department-wide, your program, and your class.
           </p>
         </div>
 
-        {events.length > 0 && (
-          <section className="flex flex-col gap-3">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Events</h2>
-            {events.map((n) => (
-              <div key={n.id} className="rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-950">
-                <div className="font-medium text-zinc-900 dark:text-zinc-50">{n.title}</div>
-                <div className="mt-1 text-xs text-zinc-500">
-                  {n.eventStartAt && new Date(n.eventStartAt).toLocaleString()}
-                  {n.eventEndAt && ` – ${new Date(n.eventEndAt).toLocaleString()}`}
-                  {n.location ? ` · ${n.location}` : ""}
-                </div>
-                {n.body && <p className="mt-2 text-zinc-600 dark:text-zinc-400">{n.body}</p>}
-                {(attachmentsByNotice.get(n.id) ?? []).map((a) => (
-                  <a key={a.id} href={a.fileUrl} target="_blank" rel="noreferrer" className="mt-2 block text-xs text-blue-700 hover:underline dark:text-blue-400">
-                    📎 {a.fileName}
-                  </a>
-                ))}
-              </div>
-            ))}
-          </section>
-        )}
+        <section className="flex flex-col gap-3">
+          <h2 className="text-sm font-semibold text-slate-900">Events</h2>
+          {events.length === 0 ? (
+            <Card>
+              <CardBody>
+                <EmptyState icon={<CalendarCheckIcon className="h-9 w-9" />} title="No upcoming events" />
+              </CardBody>
+            </Card>
+          ) : (
+            events.map((n) => (
+              <Card key={n.id}>
+                <CardBody>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium text-slate-900">{n.title}</span>
+                    <Badge tone="brand">{n.category}</Badge>
+                    <Badge tone="neutral">{scopeLabel(n.audienceScope)}</Badge>
+                  </div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    {n.eventStartAt && new Date(n.eventStartAt).toLocaleString()}
+                    {n.eventEndAt && ` – ${new Date(n.eventEndAt).toLocaleString()}`}
+                    {n.location ? ` · ${n.location}` : ""}
+                  </div>
+                  {n.body && <p className="mt-2 text-sm text-slate-600">{n.body}</p>}
+                  {(attachmentsByNotice.get(n.id) ?? []).map((a) => (
+                    <a
+                      key={a.id}
+                      href={a.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 flex items-center gap-1.5 text-xs text-indigo-600 hover:underline"
+                    >
+                      <DocumentIcon className="h-3.5 w-3.5 shrink-0" />
+                      {a.fileName}
+                    </a>
+                  ))}
+                </CardBody>
+              </Card>
+            ))
+          )}
+        </section>
 
         <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Notices</h2>
-          {plainNotices.length === 0 && <p className="text-sm text-zinc-500">Nothing yet.</p>}
-          {plainNotices.map((n) => (
-            <div key={n.id} className="rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-950">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-medium text-zinc-900 dark:text-zinc-50">{n.title}</span>
-                <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">{n.category}</span>
-                <span className="text-xs text-zinc-400">
-                  {n.audienceScope === "department" && "Department-wide"}
-                  {n.audienceScope === "program" && "Program"}
-                  {n.audienceScope === "class" && "Class"}
-                </span>
-                {n.semesterLabel && <span className="text-xs text-zinc-400">· {n.semesterLabel}</span>}
-              </div>
-              {n.body && <p className="mt-1 text-zinc-600 dark:text-zinc-400">{n.body}</p>}
-              {(attachmentsByNotice.get(n.id) ?? []).map((a) => (
-                <a key={a.id} href={a.fileUrl} target="_blank" rel="noreferrer" className="mt-1 block text-xs text-blue-700 hover:underline dark:text-blue-400">
-                  📎 {a.fileName}
-                </a>
-              ))}
-            </div>
-          ))}
+          <h2 className="text-sm font-semibold text-slate-900">Notices</h2>
+          {plainNotices.length === 0 ? (
+            <Card>
+              <CardBody>
+                <EmptyState icon={<BellIcon className="h-9 w-9" />} title="Nothing yet" />
+              </CardBody>
+            </Card>
+          ) : (
+            plainNotices.map((n) => (
+              <Card key={n.id}>
+                <CardBody>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium text-slate-900">{n.title}</span>
+                    <Badge tone="brand">{n.category}</Badge>
+                    <Badge tone="neutral">{scopeLabel(n.audienceScope)}</Badge>
+                    {n.semesterLabel && <span className="text-xs text-slate-400">{n.semesterLabel}</span>}
+                  </div>
+                  {n.body && <p className="mt-1 text-sm text-slate-600">{n.body}</p>}
+                  {(attachmentsByNotice.get(n.id) ?? []).map((a) => (
+                    <a
+                      key={a.id}
+                      href={a.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-1 flex items-center gap-1.5 text-xs text-indigo-600 hover:underline"
+                    >
+                      <DocumentIcon className="h-3.5 w-3.5 shrink-0" />
+                      {a.fileName}
+                    </a>
+                  ))}
+                </CardBody>
+              </Card>
+            ))
+          )}
         </section>
       </main>
     </div>

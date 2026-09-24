@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testDb } from "../db";
-import { batches, classes, programs } from "@/db/schema/academic-structure";
+import { academicTerms, batches, classes, courseOfferings, courses, programs } from "@/db/schema/academic-structure";
 import { studentProfiles, teacherProfiles } from "@/db/schema/identity";
 import { withUserDbFor } from "./with-user-test-db";
 
@@ -27,6 +27,10 @@ let fixtureIds: {
   studentAId: string;
   studentBId: string;
   teacherId: string;
+  courseId: string;
+  termId: string;
+  offeringId: string;
+  assignedTeacherId: string;
 };
 
 beforeAll(async () => {
@@ -66,12 +70,31 @@ beforeAll(async () => {
       sql`insert into auth.users (email) values (${"rls-teacher-" + Date.now() + "@example.test"}) returning id`,
     )
   ).map((r) => r as unknown as { id: string });
+  const [{ id: assignedTeacherId }] = (
+    await testDb.execute<{ id: string }>(
+      sql`insert into auth.users (email) values (${"rls-assigned-teacher-" + Date.now() + "@example.test"}) returning id`,
+    )
+  ).map((r) => r as unknown as { id: string });
 
   await testDb.insert(studentProfiles).values([
     { userId: studentAId, fullName: "Student A", rollNumber: `A-${Date.now()}`, classId: cls.id },
     { userId: studentBId, fullName: "Student B", rollNumber: `B-${Date.now()}`, classId: cls.id },
   ]);
-  await testDb.insert(teacherProfiles).values({ userId: teacherId, fullName: "RLS Test Teacher" });
+  await testDb.insert(teacherProfiles).values([
+    { userId: teacherId, fullName: "RLS Test Teacher" },
+    { userId: assignedTeacherId, fullName: "RLS Assigned Teacher" },
+  ]);
+
+  const [course] = await testDb
+    .insert(courses)
+    .values({ programId: program.id, code: `RLS-CRS-${Date.now()}`, title: "RLS Test Course", creditHours: "3.0", curriculumSemester: 1 })
+    .returning();
+  const year = 5000 + Math.floor(Math.random() * 90000);
+  const [term] = await testDb.insert(academicTerms).values({ season: "fall", year, name: `RLS Fall ${year}` }).returning();
+  const [offering] = await testDb
+    .insert(courseOfferings)
+    .values({ classId: cls.id, courseId: course.id, termId: term.id, teacherId: assignedTeacherId, semesterNumber: 1 })
+    .returning();
 
   fixtureIds = {
     programId: program.id,
@@ -80,16 +103,24 @@ beforeAll(async () => {
     studentAId,
     studentBId,
     teacherId,
+    courseId: course.id,
+    termId: term.id,
+    offeringId: offering.id,
+    assignedTeacherId,
   };
 });
 
 afterAll(async () => {
   if (!fixtureIds) return;
+  await testDb.delete(courseOfferings).where(eq(courseOfferings.id, fixtureIds.offeringId));
+  await testDb.delete(courses).where(eq(courses.id, fixtureIds.courseId));
+  await testDb.delete(academicTerms).where(eq(academicTerms.id, fixtureIds.termId));
   await testDb.delete(studentProfiles).where(eq(studentProfiles.classId, fixtureIds.classId));
   await testDb.delete(teacherProfiles).where(eq(teacherProfiles.userId, fixtureIds.teacherId));
+  await testDb.delete(teacherProfiles).where(eq(teacherProfiles.userId, fixtureIds.assignedTeacherId));
   const { sql } = await import("drizzle-orm");
   await testDb.execute(
-    sql`delete from auth.users where id in (${fixtureIds.studentAId}, ${fixtureIds.studentBId}, ${fixtureIds.teacherId})`,
+    sql`delete from auth.users where id in (${fixtureIds.studentAId}, ${fixtureIds.studentBId}, ${fixtureIds.teacherId}, ${fixtureIds.assignedTeacherId})`,
   );
   await testDb.delete(classes).where(eq(classes.id, fixtureIds.classId));
   await testDb.delete(batches).where(eq(batches.id, fixtureIds.batchId));
@@ -136,5 +167,36 @@ describe("teacher_profiles RLS (Task 12)", () => {
       tx.select().from(studentProfiles).where(eq(studentProfiles.userId, fixtureIds.studentAId)),
     );
     expect(studentRowsViaTeacherSession).toHaveLength(0);
+  });
+});
+
+// Regression coverage for a real gap found during frontend verification
+// (see db/migrations/0008_student_profiles_teacher_select.sql): a teacher's
+// UI queries join attendance_records/results to student_profiles to show a
+// roster's name/roll number. Without this policy, the join silently
+// returned zero rows for every teacher — attendance_records/results were
+// visible, but student_profiles wasn't, so the INNER JOIN dropped
+// everything.
+describe("student_profiles_teacher_select RLS (Task 18/19 follow-up)", () => {
+  it("a teacher WITH a course offering in the student's class CAN see that student's profile", async () => {
+    const rows = await withUserDbFor(fixtureIds.assignedTeacherId, async (tx) =>
+      tx.select().from(studentProfiles).where(eq(studentProfiles.userId, fixtureIds.studentAId)),
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0].fullName).toBe("Student A");
+  });
+
+  it("a teacher WITH a course offering in the class sees every student in that class, not just one", async () => {
+    const rows = await withUserDbFor(fixtureIds.assignedTeacherId, async (tx) =>
+      tx.select().from(studentProfiles).where(eq(studentProfiles.classId, fixtureIds.classId)),
+    );
+    expect(rows.map((r) => r.userId).sort()).toEqual([fixtureIds.studentAId, fixtureIds.studentBId].sort());
+  });
+
+  it("a teacher WITHOUT any course offering in that class still sees nothing — scope is real, not blanket teacher access", async () => {
+    const rows = await withUserDbFor(fixtureIds.teacherId, async (tx) =>
+      tx.select().from(studentProfiles).where(eq(studentProfiles.classId, fixtureIds.classId)),
+    );
+    expect(rows).toHaveLength(0);
   });
 });

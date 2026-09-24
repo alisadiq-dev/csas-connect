@@ -3,6 +3,11 @@ import { listAllCourses } from "@/lib/academic-structure/courses";
 import { listAcademicTerms } from "@/lib/academic-structure/terms";
 import { listAllOfferingsWithContext } from "@/lib/academic-structure/offerings";
 import { createCourseOfferingAction } from "./actions";
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { Table, THead, Th, TBody, Tr, Td } from "@/components/ui/Table";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Badge } from "@/components/ui/Badge";
+import { LinkIcon } from "@/components/icons";
 
 export default async function OfferingsPage() {
   const [classes, courses, terms, offerings] = await Promise.all([
@@ -16,65 +21,113 @@ export default async function OfferingsPage() {
     `${cls.programName} — Intake ${cls.intakeYear} ${cls.sectionType} (sem ${cls.currentSemester})`;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Course Offerings</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <h1 className="text-xl font-semibold text-slate-900">Course Offerings</h1>
+        <p className="mt-1 text-sm text-slate-500">
           Links a class + course + term. This is the record every other module (attendance, results,
           timetable) references — never the class or course directly.
         </p>
       </div>
 
-      <form action={createCourseOfferingAction} className="flex flex-wrap items-end gap-3 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-zinc-700 dark:text-zinc-300">Class</span>
-          <select name="classId" required className="w-full sm:w-72 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
-            {classes.map((cls) => (
-              <option key={cls.id} value={cls.id}>
-                {classLabel(cls)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-zinc-700 dark:text-zinc-300">Course</span>
-          <select name="courseId" required className="w-full sm:w-56 rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
-            {courses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.code} — {course.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-zinc-700 dark:text-zinc-300">Term</span>
-          <select name="termId" required className="rounded border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
-            {terms.map((term) => (
-              <option key={term.id} value={term.id}>
-                {term.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button type="submit" className="rounded bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900">
-          Create offering
-        </button>
-      </form>
+      <Card>
+        <CardHeader title="Add an offering" />
+        <CardBody>
+          <form action={createCourseOfferingAction} className="flex flex-wrap items-end gap-3">
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-medium text-slate-700">Class</span>
+              <select
+                name="classId"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 sm:w-72"
+              >
+                {classes.map((cls) => (
+                  <option key={cls.id} value={cls.id}>
+                    {classLabel(cls)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-medium text-slate-700">Course</span>
+              <select
+                name="courseId"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 sm:w-56"
+              >
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.code} — {course.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-medium text-slate-700">Term</span>
+              <select
+                name="termId"
+                required
+                className="rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              >
+                {terms.map((term) => (
+                  <option key={term.id} value={term.id}>
+                    {term.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="submit"
+              className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              Create offering
+            </button>
+          </form>
+        </CardBody>
+      </Card>
 
-      <ul className="divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-950">
-        {offerings.length === 0 && <li className="p-4 text-sm text-zinc-500">No offerings yet.</li>}
-        {offerings.map((offering) => (
-          <li key={offering.id} className="flex flex-wrap items-center justify-between gap-2 p-4 text-sm">
-            <span className="text-zinc-900 dark:text-zinc-50">
-              {offering.courseCode} — {offering.courseTitle}
-            </span>
-            <span className="text-zinc-500">
-              {offering.termName} · semester {offering.semesterNumber} ·{" "}
-              {offering.teacherId ? "teacher assigned" : "unassigned"}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <Card>
+        <CardHeader
+          title="All offerings"
+          description={`${offerings.length} offering${offerings.length === 1 ? "" : "s"}`}
+        />
+        <CardBody>
+          {offerings.length === 0 ? (
+            <EmptyState
+              icon={<LinkIcon />}
+              title="No offerings yet"
+              description="Create the first course offering above."
+            />
+          ) : (
+            <Table>
+              <THead>
+                <Th>Course</Th>
+                <Th>Term</Th>
+                <Th>Semester</Th>
+                <Th>Teacher</Th>
+              </THead>
+              <TBody>
+                {offerings.map((offering) => (
+                  <Tr key={offering.id}>
+                    <Td className="font-medium text-slate-900">
+                      {offering.courseCode} — {offering.courseTitle}
+                    </Td>
+                    <Td>{offering.termName}</Td>
+                    <Td>{offering.semesterNumber}</Td>
+                    <Td>
+                      {offering.teacherId ? (
+                        <Badge tone="success">Assigned</Badge>
+                      ) : (
+                        <Badge tone="neutral">Unassigned</Badge>
+                      )}
+                    </Td>
+                  </Tr>
+                ))}
+              </TBody>
+            </Table>
+          )}
+        </CardBody>
+      </Card>
     </div>
   );
 }

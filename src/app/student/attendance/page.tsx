@@ -1,6 +1,10 @@
 import { requireRole } from "@/lib/identity/require-role";
 import { listAttendanceForStudent } from "@/lib/attendance/student";
 import { attendancePercentage } from "@/lib/attendance/percentage";
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { CalendarCheckIcon } from "@/components/icons";
 
 export default async function StudentAttendancePage() {
   const session = await requireRole("student");
@@ -19,42 +23,44 @@ export default async function StudentAttendancePage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Attendance</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <h1 className="text-xl font-semibold text-slate-900">Attendance</h1>
+        <p className="mt-1 text-sm text-slate-500">
           Your own attendance only — percentage and a session-by-session breakdown per course.
         </p>
       </div>
 
-      {byOffering.size === 0 && <p className="text-sm text-zinc-500">No attendance recorded yet.</p>}
-
-      {Array.from(byOffering.entries()).map(([offeringId, group]) => {
-        const pct = attendancePercentage(group.records);
-        return (
-          <div key={offeringId} className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-                {group.courseCode} — {group.courseTitle}
-              </h2>
-              <span
-                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  pct < 75
-                    ? "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300"
-                    : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300"
-                }`}
-              >
-                {pct}%
-              </span>
-            </div>
-            <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
-              {group.records.map((r) => (
-                <li key={r.recordId}>
-                  {r.sessionDate}: <span className="font-medium">{r.status}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      })}
+      {byOffering.size === 0 ? (
+        <Card>
+          <CardBody>
+            <EmptyState
+              icon={<CalendarCheckIcon className="h-9 w-9" />}
+              title="No attendance recorded yet"
+              description="Your attendance will show up here once your teachers start marking sessions."
+            />
+          </CardBody>
+        </Card>
+      ) : (
+        Array.from(byOffering.entries()).map(([offeringId, group]) => {
+          const pct = attendancePercentage(group.records);
+          return (
+            <Card key={offeringId}>
+              <CardHeader
+                title={`${group.courseCode} — ${group.courseTitle}`}
+                action={<Badge tone={pct < 75 ? "danger" : "success"}>{pct}%</Badge>}
+              />
+              <CardBody>
+                <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-slate-500">
+                  {group.records.map((r) => (
+                    <li key={r.recordId}>
+                      {r.sessionDate}: <span className="font-medium text-slate-700">{r.status}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardBody>
+            </Card>
+          );
+        })
+      )}
     </div>
   );
 }

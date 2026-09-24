@@ -9,5 +9,8 @@ if (!connectionString) {
   throw new Error("DATABASE_URL_TEST is not set — is .env.local loaded?");
 }
 
-const client = postgres(connectionString);
+// See src/db/index.ts for why `prepare: false` is required whenever a
+// pooled connection is shared across withUserDb() calls for different
+// users/roles.
+const client = postgres(connectionString, { prepare: false });
 export const testDb = drizzle(client);

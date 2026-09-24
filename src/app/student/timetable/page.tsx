@@ -34,7 +34,7 @@ export default async function StudentTimetablePage() {
       <Card>
         <CardHeader title="Weekly schedule" />
         <CardBody>
-          <WeeklyGrid periods={periods} slots={slots} renderCell={(slot) => <Cell slot={slot} />} />
+          <WeeklyGrid periods={periods} slots={slots.map((slot) => ({ ...slot, content: <Cell slot={slot} /> }))} />
         </CardBody>
       </Card>
     </div>

@@ -1,5 +1,10 @@
 import { listAllClassesWithContext } from "@/lib/academic-structure/classes";
 import { listAllStudents } from "@/lib/identity/students";
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { Table, THead, Th, TBody, Tr, Td } from "@/components/ui/Table";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { UsersIcon } from "@/components/icons";
 import { StudentForm } from "./student-form";
 
 export default async function StudentsPage() {
@@ -9,35 +14,53 @@ export default async function StudentsPage() {
   );
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Students</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <h1 className="text-xl font-semibold text-slate-900">Students</h1>
+        <p className="mt-1 text-sm text-slate-500">
           Pick a class; the roll number is generated automatically ({"{seq}"}-{"{yy}"}). Flag a student as CR for
           their own class here.
         </p>
       </div>
 
-      <StudentForm classes={classes.map((cls) => ({ id: cls.id, label: classLabelById.get(cls.id)! }))} />
+      <Card>
+        <CardHeader title="Add a student" description="The roll number is generated automatically for the selected class." />
+        <CardBody>
+          <StudentForm classes={classes.map((cls) => ({ id: cls.id, label: classLabelById.get(cls.id)! }))} />
+        </CardBody>
+      </Card>
 
-      <ul className="divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-950">
-        {students.length === 0 && <li className="p-4 text-sm text-zinc-500">No students yet.</li>}
-        {students.map((student) => (
-          <li key={student.userId} className="flex flex-wrap items-center justify-between gap-2 p-4 text-sm">
-            <span className="text-zinc-900 dark:text-zinc-50">
-              {student.rollNumber} — {student.fullName}
-            </span>
-            <span className="flex items-center gap-2 text-zinc-500">
-              {classLabelById.get(student.classId) ?? "Unknown class"}
-              {student.isClassRep && (
-                <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
-                  CR
-                </span>
-              )}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <Card>
+        <CardHeader title="Student accounts" description={`${students.length} student${students.length === 1 ? "" : "s"}`} />
+        <CardBody>
+          {students.length === 0 ? (
+            <EmptyState
+              icon={<UsersIcon className="h-9 w-9" />}
+              title="No students yet"
+              description="Student accounts you create will show up here."
+            />
+          ) : (
+            <Table>
+              <THead>
+                <Th>Roll No</Th>
+                <Th>Name</Th>
+                <Th>Class</Th>
+                <Th>Role</Th>
+              </THead>
+              <TBody>
+                {students.map((student) => (
+                  <Tr key={student.userId}>
+                    <Td className="font-medium text-slate-900">{student.rollNumber}</Td>
+                    <Td>{student.fullName}</Td>
+                    <Td>{classLabelById.get(student.classId) ?? "Unknown class"}</Td>
+                    <Td>{student.isClassRep && <Badge tone="brand">CR</Badge>}</Td>
+                  </Tr>
+                ))}
+              </TBody>
+            </Table>
+          )}
+        </CardBody>
+      </Card>
     </div>
   );
 }

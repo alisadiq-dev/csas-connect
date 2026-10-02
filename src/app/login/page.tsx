@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { AlertIcon } from "@/components/icons";
 import CircularGallery from "@/components/gallery/CircularGallery";
+import DotField from "@/components/effects/DotField";
 import { loginAction, type LoginState } from "./actions";
 
 // Placeholder tiles (public/gallery/) labeling the university, college, and
@@ -26,31 +27,39 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <div className="relative hidden flex-1 flex-col justify-between overflow-hidden bg-indigo-700 p-10 text-white lg:flex">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 60% 70%, white 1px, transparent 1px)",
-            backgroundSize: "34px 34px",
-          }}
-        />
-        <Logo size="lg" tone="dark" />
-
-        <div className="max-w-sm">
-          <h1 className="text-3xl font-semibold tracking-tight">A single home for CSAS academic records.</h1>
-          <p className="mt-3 text-sm leading-relaxed text-indigo-100">
-            Attendance, results, GPA/CGPA and timetables for BS Statistics, BS Biostatistics and BS Computational
-            Statistics — Regular and Replica sections — in one portal for students, teachers and administrators.
-          </p>
+      <div className="relative hidden flex-1 overflow-hidden bg-indigo-700 p-10 text-white lg:flex">
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-0 opacity-40">
+          <DotField
+            dotRadius={1.5}
+            dotSpacing={14}
+            bulgeStrength={50}
+            glowRadius={160}
+            cursorRadius={260}
+            cursorForce={0.1}
+            bulgeOnly
+            gradientFrom="rgba(199, 210, 254, 0.5)"
+            gradientTo="rgba(129, 140, 248, 0.35)"
+            glowColor="#EEF2FF"
+          />
         </div>
 
-        <div className="h-72 w-full overflow-hidden rounded-xl border border-white/10 bg-black/10">
-          <CircularGallery items={GALLERY_ITEMS} bend={2} textColor="#ffffff" borderRadius={0.05} scrollSpeed={1.5} scrollEase={0.06} />
-        </div>
+        <div className="relative z-10 flex flex-1 flex-col justify-between">
+          <Logo size="lg" tone="dark" />
 
-        <p className="text-xs text-indigo-200">University of the Punjab · College of Statistical &amp; Actuarial Sciences</p>
+          <div className="max-w-sm">
+            <h1 className="text-3xl font-semibold tracking-tight">A single home for CSAS academic records.</h1>
+            <p className="mt-3 text-sm leading-relaxed text-indigo-100">
+              Attendance, results, GPA/CGPA and timetables for BS Statistics, BS Biostatistics and BS Computational
+              Statistics — Regular and Replica sections — in one portal for students, teachers and administrators.
+            </p>
+          </div>
+
+          <div className="h-72 w-full overflow-hidden rounded-xl border border-white/10 bg-black/10">
+            <CircularGallery items={GALLERY_ITEMS} bend={2} textColor="#ffffff" borderRadius={0.05} scrollSpeed={1.5} scrollEase={0.06} />
+          </div>
+
+          <p className="text-xs text-indigo-200">University of the Punjab · College of Statistical &amp; Actuarial Sciences</p>
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-10 sm:px-6">

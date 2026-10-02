@@ -184,8 +184,16 @@ class Title {
     });
     this.mesh = new Mesh(this.gl, { geometry, program });
     const aspect = width / height;
-    const textHeight = this.plane.scale.y * 0.15;
-    const textWidth = textHeight * aspect;
+    let textHeight = this.plane.scale.y * 0.15;
+    let textWidth = textHeight * aspect;
+    // Clamp to the card's own width — a long label (e.g. a full department
+    // name) otherwise produces a text mesh much wider than the card itself,
+    // bleeding into neighboring cards instead of shrinking to fit.
+    const maxWidth = this.plane.scale.x * 0.92;
+    if (textWidth > maxWidth) {
+      textWidth = maxWidth;
+      textHeight = textWidth / aspect;
+    }
     this.mesh.scale.set(textWidth, textHeight, 1);
     this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeight * 0.5 - 0.05;
     this.mesh.setParent(this.plane);

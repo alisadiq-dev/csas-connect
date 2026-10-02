@@ -3,7 +3,21 @@
 import { useActionState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { AlertIcon } from "@/components/icons";
+import CircularGallery from "@/components/gallery/CircularGallery";
 import { loginAction, type LoginState } from "./actions";
+
+// Placeholder tiles (public/gallery/) labeling the university, college, and
+// three programs — not photographs, since no real campus/department photos
+// have been supplied yet. Swap `image` for a real photo path per item
+// whenever they're available; `text` can stay or be replaced with a caption.
+const GALLERY_ITEMS = [
+  { image: "/gallery/placeholder-1.jpg", text: "University of the Punjab" },
+  { image: "/gallery/placeholder-2.jpg", text: "College of Statistical & Actuarial Sciences" },
+  { image: "/gallery/placeholder-3.jpg", text: "BS Statistics" },
+  { image: "/gallery/placeholder-4.jpg", text: "BS Biostatistics" },
+  { image: "/gallery/placeholder-5.jpg", text: "BS Computational Statistics" },
+  { image: "/gallery/placeholder-6.jpg", text: "CSAS Connect" },
+];
 
 const initialState: LoginState = { error: null };
 
@@ -23,6 +37,7 @@ export default function LoginPage() {
           }}
         />
         <Logo size="lg" tone="dark" />
+
         <div className="max-w-sm">
           <h1 className="text-3xl font-semibold tracking-tight">A single home for CSAS academic records.</h1>
           <p className="mt-3 text-sm leading-relaxed text-indigo-100">
@@ -30,6 +45,11 @@ export default function LoginPage() {
             Statistics — Regular and Replica sections — in one portal for students, teachers and administrators.
           </p>
         </div>
+
+        <div className="h-72 w-full overflow-hidden rounded-xl border border-white/10 bg-black/10">
+          <CircularGallery items={GALLERY_ITEMS} bend={2} textColor="#ffffff" borderRadius={0.05} scrollSpeed={1.5} scrollEase={0.06} />
+        </div>
+
         <p className="text-xs text-indigo-200">University of the Punjab · College of Statistical &amp; Actuarial Sciences</p>
       </div>
 

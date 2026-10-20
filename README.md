@@ -25,6 +25,15 @@ npm run db:studio         # opens Drizzle Studio against the local dev database
 
 Demo login credentials after seeding (local dev only — see "Local auth shim" below): `admin@csas-connect.local` / `AdminPass123!`, `teacher.<program-code>.<1-4>@csas-connect.local` / `TeacherPass123!` (program codes: `stat`, `biostat`, `cs`), and any seeded student (`select email from auth.users` after seeding, or query `student_profiles` for a roll number and reconstruct `student.<roll-number>.<class-id-prefix>@csas-connect.local`) / `StudentPass123!`. Both seed scripts are idempotent — safe to re-run, they skip if already seeded.
 
+
+### Demo accounts on the landing / login pages
+
+The landing page ("Try it with a test account") and the login page ("Quick fill") show the seeded demo logins for one-tap copy/fill. They are **only shown outside production**; set `SHOW_DEMO_ACCOUNTS=true` to show them on a deployed site (don't, unless that deployment is a throwaway demo).
+
+### Install as an app (PWA)
+
+`/manifest.webmanifest` + generated icons (`/pwa-icon/*`, `/apple-icon`) make the site installable: on a phone use "Add to Home Screen" and it opens full-screen with a bottom tab bar. There is no service worker, so it needs a connection.
+
 ### Local auth shim (RLS testing without a real Supabase project)
 
 No cloud Supabase project is connected yet (see "Cloud setup" below), but Row-Level Security still needs to be tested against real Postgres. `scripts/local-auth-shim.sql` (applied automatically by `npm run db:local:start`, never part of `db/migrations/`) makes the local dev/test databases provide `auth.users`, `auth.uid()`, and the `authenticated` role the same way real Supabase-hosted Postgres does, plus a local-only `auth.local_credentials` table so `/login` can verify passwords without a real GoTrue server running. `src/lib/db/with-user.ts` (`withUserDb`) is the only code path that should run student/teacher/CR-scoped queries — it drops the Postgres session to the `authenticated` role and sets `auth.uid()` inside a transaction, exactly like Supabase's PostgREST does, so nothing here needs to change once a real project exists.

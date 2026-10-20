@@ -6,6 +6,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Table, THead, Th, TBody, Tr, Td } from "@/components/ui/Table";
 import { ChartIcon, DocumentIcon } from "@/components/icons";
+import { MiniBars } from "@/components/ui/charts";
 
 export default async function StudentResultsPage() {
   const session = await requireRole("student");
@@ -47,6 +48,21 @@ export default async function StudentResultsPage() {
           />
         )}
       </div>
+
+      {semesters.length > 1 && (
+        <Card>
+          <CardHeader title="GPA by semester" />
+          <CardBody>
+            <MiniBars
+              values={[...semesters].reverse().map((n) => computeSemesterGpa(forGpa, n))}
+              max={4}
+              height={100}
+              labels={[...semesters].reverse().map((n) => `S${n}`)}
+              ariaLabel="GPA by semester"
+            />
+          </CardBody>
+        </Card>
+      )}
 
       {rows.length === 0 ? (
         <Card>

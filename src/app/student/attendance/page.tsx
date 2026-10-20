@@ -5,6 +5,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { CalendarCheckIcon } from "@/components/icons";
+import { RingGauge } from "@/components/ui/charts";
 
 export default async function StudentAttendancePage() {
   const session = await requireRole("student");
@@ -46,7 +47,12 @@ export default async function StudentAttendancePage() {
             <Card key={offeringId}>
               <CardHeader
                 title={`${group.courseCode} — ${group.courseTitle}`}
-                action={<Badge tone={pct < 75 ? "danger" : "success"}>{pct}%</Badge>}
+                action={
+                  <div className="flex items-center gap-3">
+                    <Badge tone={pct < 75 ? "danger" : "success"}>{pct < 75 ? "Below 75%" : "On track"}</Badge>
+                    <RingGauge value={pct} size={48} stroke={6} danger={pct < 75} label={`${group.courseCode} attendance ${pct} percent`} />
+                  </div>
+                }
               />
               <CardBody>
                 <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-slate-500">

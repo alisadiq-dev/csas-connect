@@ -7,10 +7,10 @@ const NAV_SECTIONS: NavSection[] = [
   {
     label: "Main",
     items: [
-      { href: "/teacher", label: "Dashboard", icon: "dashboard" },
-      { href: "/teacher/attendance", label: "Attendance", icon: "attendance" },
-      { href: "/teacher/results", label: "Results", icon: "results" },
-      { href: "/teacher/timetable", label: "Timetable", icon: "timetable" },
+      { href: "/teacher", label: "Dashboard", icon: "dashboard", primary: true },
+      { href: "/teacher/attendance", label: "Attendance", icon: "attendance", primary: true },
+      { href: "/teacher/results", label: "Results", icon: "results", primary: true },
+      { href: "/teacher/timetable", label: "Timetable", icon: "timetable", primary: true },
     ],
   },
   {

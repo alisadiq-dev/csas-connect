@@ -6,13 +6,13 @@ import { getStudentByUserId } from "@/lib/identity/students";
 const NAV_SECTIONS: NavSection[] = [
   {
     label: "Main",
-    items: [{ href: "/student", label: "Student dashboard", icon: "dashboard" }],
+    items: [{ href: "/student", label: "Student dashboard", icon: "dashboard", primary: true }],
   },
   {
     label: "Class Rep",
     items: [
-      { href: "/cr/notices", label: "Class Notices", icon: "notices" },
-      { href: "/cr/timetable", label: "Timetable", icon: "timetable" },
+      { href: "/cr/notices", label: "Class Notices", icon: "notices", primary: true },
+      { href: "/cr/timetable", label: "Timetable", icon: "timetable", primary: true },
     ],
   },
   {

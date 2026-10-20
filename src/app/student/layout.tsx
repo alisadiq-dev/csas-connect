@@ -8,10 +8,10 @@ const NAV_SECTIONS: NavSection[] = [
   {
     label: "Main",
     items: [
-      { href: "/student", label: "Dashboard", icon: "dashboard" },
-      { href: "/student/attendance", label: "Attendance", icon: "attendance" },
-      { href: "/student/results", label: "Results", icon: "results" },
-      { href: "/student/timetable", label: "Timetable", icon: "timetable" },
+      { href: "/student", label: "Dashboard", icon: "dashboard", primary: true },
+      { href: "/student/attendance", label: "Attendance", icon: "attendance", primary: true },
+      { href: "/student/results", label: "Results", icon: "results", primary: true },
+      { href: "/student/timetable", label: "Timetable", icon: "timetable", primary: true },
     ],
   },
   {

@@ -16,6 +16,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ScheduleList } from "@/components/dashboard/ScheduleList";
 import { CalendarCheckIcon, ChartIcon, ClockIcon, BookIcon, BellIcon } from "@/components/icons";
+import { MiniBars, ProgressBar, RingGauge } from "@/components/ui/charts";
 import { formatTime } from "@/lib/format";
 
 export default async function StudentDashboardPage() {
@@ -47,6 +48,20 @@ export default async function StudentDashboardPage() {
   const currentSemester = classContext?.currentSemester;
   const semesterGpa = currentSemester !== undefined ? computeSemesterGpa(forGpa, currentSemester) : 0;
 
+  const gpaSemesters = Array.from(new Set(forGpa.map((r) => r.semesterNumber))).sort((a, b) => a - b);
+  const gpaTrend = gpaSemesters.map((sem) => computeSemesterGpa(forGpa, sem));
+
+  const attendanceByCourse = new Map<string, { code: string; records: typeof attendanceRecords }>();
+  for (const r of attendanceRecords) {
+    const g = attendanceByCourse.get(r.courseOfferingId);
+    if (g) g.records.push(r);
+    else attendanceByCourse.set(r.courseOfferingId, { code: r.courseCode, records: [r] });
+  }
+  const courseAttendance = Array.from(attendanceByCourse.values()).map((g) => ({
+    code: g.code,
+    pct: attendancePercentage(g.records),
+  }));
+
   const now = new Date();
   const todaySchedule = buildTodaySchedule(slots, periods, now);
 
@@ -76,10 +91,12 @@ export default async function StudentDashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Identity banner */}
-      <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-indigo-50 via-white to-white p-5 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-night-900 via-night-800 to-indigo-900 p-5 text-white sm:p-7">
+        <div aria-hidden className="night-grid absolute inset-0 opacity-70" />
+        <div aria-hidden className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-indigo-500/30 blur-3xl" />
+        <div className="relative flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-lg font-semibold text-white">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-lg font-semibold text-white">
               {(profile?.fullName ?? "S")
                 .split(" ")
                 .map((p) => p[0])
@@ -88,8 +105,8 @@ export default async function StudentDashboardPage() {
                 .toUpperCase()}
             </span>
             <div>
-              <p className="text-xs text-slate-500">Welcome back</p>
-              <h1 className="text-xl font-semibold text-slate-900">{profile?.fullName ?? "Student"}</h1>
+              <p className="text-xs text-ice/70">Welcome back</p>
+              <h1 className="text-2xl font-light tracking-tight">{profile?.fullName ?? "Student"}</h1>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <Badge tone="brand">Roll {profile?.rollNumber}</Badge>
                 {classContext && <Badge tone="info">{classContext.programName}</Badge>}
@@ -98,6 +115,19 @@ export default async function StudentDashboardPage() {
                 )}
                 {classContext && <Badge tone="neutral">Semester {classContext.currentSemester}</Badge>}
               </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <RingGauge
+              value={overallAttendance}
+              size={92}
+              tone="dark"
+              danger={overallAttendance < 75}
+              label={`Overall attendance ${overallAttendance} percent`}
+            />
+            <div className="text-sm">
+              <p className="font-medium">Overall attendance</p>
+              <p className="text-xs text-ice/70">{overallAttendance < 75 ? "Below the 75% threshold" : "On track"}</p>
             </div>
           </div>
         </div>
@@ -115,6 +145,50 @@ export default async function StudentDashboardPage() {
         />
         <StatCard icon={<BookIcon />} label="Enrolled courses" value={courseCount} tone="amber" />
       </div>
+
+      {(gpaTrend.length > 0 || courseAttendance.length > 0) && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {gpaTrend.length > 0 && (
+            <Card>
+              <CardHeader title="GPA by semester" description="Computed from your published results" />
+              <CardBody>
+                <MiniBars
+                  values={gpaTrend}
+                  max={4}
+                  height={110}
+                  labels={gpaSemesters.map((n) => `S${n}`)}
+                  ariaLabel={`GPA by semester: ${gpaSemesters.map((n, i) => `semester ${n} ${gpaTrend[i].toFixed(2)}`).join(", ")}`}
+                />
+              </CardBody>
+            </Card>
+          )}
+          {courseAttendance.length > 0 && (
+            <Card>
+              <CardHeader
+                title="Attendance by course"
+                action={
+                  <Link href="/student/attendance" className="text-xs font-medium text-indigo-600 hover:underline">
+                    Details
+                  </Link>
+                }
+              />
+              <CardBody>
+                <ul className="flex flex-col gap-3.5">
+                  {courseAttendance.map((c) => (
+                    <li key={c.code}>
+                      <div className="mb-1 flex justify-between text-xs">
+                        <span className="font-medium text-slate-700">{c.code}</span>
+                        <span className={c.pct < 75 ? "font-medium text-rose-600" : "text-slate-500"}>{c.pct}%</span>
+                      </div>
+                      <ProgressBar value={c.pct} danger={c.pct < 75} />
+                    </li>
+                  ))}
+                </ul>
+              </CardBody>
+            </Card>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">

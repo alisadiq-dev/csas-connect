@@ -6,7 +6,7 @@ import { requireRole } from "@/lib/identity/require-role";
 const NAV_SECTIONS: NavSection[] = [
   {
     label: "Main",
-    items: [{ href: "/admin", label: "Dashboard", icon: "dashboard" }],
+    items: [{ href: "/admin", label: "Dashboard", icon: "dashboard", primary: true }],
   },
   {
     label: "Academic structure",
@@ -21,14 +21,14 @@ const NAV_SECTIONS: NavSection[] = [
     label: "People",
     items: [
       { href: "/admin/teachers", label: "Teachers", icon: "teachers" },
-      { href: "/admin/students", label: "Students", icon: "students" },
+      { href: "/admin/students", label: "Students", icon: "students", primary: true },
     ],
   },
   {
     label: "Records",
     items: [
-      { href: "/admin/attendance", label: "Attendance", icon: "attendance" },
-      { href: "/admin/results", label: "Results", icon: "results" },
+      { href: "/admin/attendance", label: "Attendance", icon: "attendance", primary: true },
+      { href: "/admin/results", label: "Results", icon: "results", primary: true },
       { href: "/admin/timetable", label: "Timetable", icon: "timetable" },
     ],
   },

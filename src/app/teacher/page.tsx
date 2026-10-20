@@ -11,6 +11,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ScheduleList } from "@/components/dashboard/ScheduleList";
 import { BellIcon, BookIcon, ClockIcon, LayersIcon } from "@/components/icons";
+import { PageHero } from "@/components/layout/PageHero";
 import { formatTime } from "@/lib/format";
 
 export default async function TeacherDashboardPage() {
@@ -61,10 +62,22 @@ export default async function TeacherDashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">Welcome back, {profile?.fullName ?? "Teacher"}</h1>
-        <p className="mt-1 text-sm text-slate-500">Your assigned classes and today&apos;s schedule at a glance.</p>
-      </div>
+      <PageHero
+        eyebrow="Teacher"
+        title={`Welcome back, ${profile?.fullName ?? "Teacher"}`}
+        description="Your assigned classes and today's schedule at a glance."
+        aside={
+          nextLectureDetail && (
+            <div className="rounded-2xl border border-ice/15 bg-white/5 px-4 py-3 text-sm backdrop-blur-sm">
+              <p className="text-xs text-ice/70">Next lecture</p>
+              <p className="font-medium">
+                {nextLectureDetail.courseCode} · {formatTime(nextLectureDetail.startTime)}
+                {nextLectureDetail.room ? ` · Room ${nextLectureDetail.room}` : ""}
+              </p>
+            </div>
+          )
+        }
+      />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard icon={<BookIcon />} label="Assigned offerings" value={assignedOfferings.size} tone="indigo" />

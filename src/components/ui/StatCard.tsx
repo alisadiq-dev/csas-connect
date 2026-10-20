@@ -25,11 +25,11 @@ export function StatCard({
   tone?: StatTone;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className={`inline-flex h-9 w-9 items-center justify-center rounded-lg ${TONE_CLASSES[tone]}`}>
+    <div className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-[0_1px_2px_rgb(15_23_42/0.04),0_8px_24px_-12px_rgb(15_23_42/0.08)]">
+      <div className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${TONE_CLASSES[tone]}`}>
         <span className="h-5 w-5">{icon}</span>
       </div>
-      <div className="mt-3 text-2xl font-semibold text-slate-900">{value}</div>
+      <div className="mt-3 text-3xl font-light tracking-tight text-slate-900">{value}</div>
       <div className="text-xs text-slate-500">{label}</div>
       {hint && <div className="mt-1 text-[11px] text-slate-400">{hint}</div>}
     </div>

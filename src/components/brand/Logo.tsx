@@ -16,6 +16,8 @@ type LogoProps = {
   size?: "sm" | "md" | "lg";
   /** Renders the two-line institutional wordmark next to the crest. */
   withWordmark?: boolean;
+  /** Show the college-name line under "CSAS Connect". */
+  subtitle?: boolean;
   /** "dark" for use on a dark/brand-colored background (e.g. the login page's brand panel). */
   tone?: "light" | "dark";
   className?: string;
@@ -27,7 +29,7 @@ const SIZES = {
   lg: { crest: 52, title: "text-xl", subtitle: "text-sm" },
 } as const;
 
-export function Logo({ size = "md", withWordmark = true, tone = "light", className = "" }: LogoProps) {
+export function Logo({ size = "md", withWordmark = true, subtitle = true, tone = "light", className = "" }: LogoProps) {
   const s = SIZES[size];
   const height = s.crest;
   const width = Math.round((CREST_NATIVE_WIDTH / CREST_NATIVE_HEIGHT) * height);
@@ -47,7 +49,7 @@ export function Logo({ size = "md", withWordmark = true, tone = "light", classNa
       {withWordmark && (
         <div className="flex flex-col leading-tight">
           <span className={`font-semibold tracking-tight ${titleColor} ${s.title}`}>CSAS Connect</span>
-          <span className={`${subtitleColor} ${s.subtitle}`}>College of Statistical &amp; Actuarial Sciences</span>
+          {subtitle && <span className={`${subtitleColor} ${s.subtitle}`}>College of Statistical &amp; Actuarial Sciences</span>}
         </div>
       )}
     </div>

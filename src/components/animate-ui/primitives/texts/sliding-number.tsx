@@ -1,0 +1,346 @@
+'use client';
+
+// Animate UI "Sliding Number" (https://animate-ui.com), adapted: previous/current value are tracked as
+// derived state instead of a ref, and non-animated mode no longer sets state in an effect, so the
+// component passes this project's React lint rules.
+
+import * as React from 'react';
+import {
+  useSpring,
+  useTransform,
+  motion,
+  useMotionValue,
+  type MotionValue,
+  type SpringOptions,
+  type HTMLMotionProps,
+} from 'motion/react';
+import useMeasure from 'react-use-measure';
+
+import {
+  useIsInView,
+  type UseIsInViewOptions,
+} from '@/hooks/use-is-in-view';
+
+type SlidingNumberRollerProps = {
+  prevValue: number;
+  value: number;
+  place: number;
+  transition: SpringOptions;
+  delay?: number;
+};
+
+function SlidingNumberRoller({
+  prevValue,
+  value,
+  place,
+  transition,
+  delay = 0,
+}: SlidingNumberRollerProps) {
+  const startNumber = Math.floor(prevValue / place) % 10;
+  const targetNumber = Math.floor(value / place) % 10;
+  const animatedValue = useSpring(startNumber, transition);
+
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      animatedValue.set(targetNumber);
+    }, delay);
+    return () => clearTimeout(timeoutId);
+  }, [targetNumber, animatedValue, delay]);
+
+  const [measureRef, { height }] = useMeasure();
+
+  return (
+    <span
+      ref={measureRef}
+      data-slot="sliding-number-roller"
+      style={{
+        position: 'relative',
+        display: 'inline-block',
+        width: '1ch',
+        overflowX: 'visible',
+        overflowY: 'clip',
+        lineHeight: 1,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      <span style={{ visibility: 'hidden' }}>0</span>
+      {Array.from({ length: 10 }, (_, i) => (
+        <SlidingNumberDisplay
+          key={i}
+          motionValue={animatedValue}
+          number={i}
+          height={height}
+          transition={transition}
+        />
+      ))}
+    </span>
+  );
+}
+
+type SlidingNumberDisplayProps = {
+  motionValue: MotionValue<number>;
+  number: number;
+  height: number;
+  transition: SpringOptions;
+};
+
+function SlidingNumberDisplay({
+  motionValue,
+  number,
+  height,
+  transition,
+}: SlidingNumberDisplayProps) {
+  const y = useTransform(motionValue, (latest) => {
+    if (!height) return 0;
+    const currentNumber = latest % 10;
+    const offset = (10 + number - currentNumber) % 10;
+    let translateY = offset * height;
+    if (offset > 5) translateY -= 10 * height;
+    return translateY;
+  });
+
+  if (!height) {
+    return (
+      <span style={{ visibility: 'hidden', position: 'absolute' }}>
+        {number}
+      </span>
+    );
+  }
+
+  return (
+    <motion.span
+      data-slot="sliding-number-display"
+      style={{
+        y,
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      transition={{ ...transition, type: 'spring' }}
+    >
+      {number}
+    </motion.span>
+  );
+}
+
+type SlidingNumberProps = Omit<HTMLMotionProps<'span'>, 'children'> & {
+  number: number;
+  fromNumber?: number;
+  onNumberChange?: (number: number) => void;
+  padStart?: boolean;
+  decimalSeparator?: string;
+  decimalPlaces?: number;
+  thousandSeparator?: string;
+  transition?: SpringOptions;
+  delay?: number;
+  initiallyStable?: boolean;
+} & UseIsInViewOptions;
+
+function SlidingNumber({
+  ref,
+  number,
+  fromNumber,
+  onNumberChange,
+  inView = false,
+  inViewMargin = '0px',
+  inViewOnce = true,
+  padStart = false,
+  decimalSeparator = '.',
+  decimalPlaces = 0,
+  thousandSeparator,
+  transition = { stiffness: 200, damping: 20, mass: 0.4 },
+  delay = 0,
+  initiallyStable = false,
+  ...props
+}: SlidingNumberProps) {
+  const { ref: localRef, isInView } = useIsInView(
+    ref as React.Ref<HTMLElement>,
+    {
+      inView,
+      inViewOnce,
+      inViewMargin,
+    },
+  );
+
+  const initialNumeric = Math.abs(Number(number));
+  const hasAnimated = fromNumber !== undefined;
+
+  const motionVal = useMotionValue(
+    initiallyStable ? initialNumeric : (fromNumber ?? 0),
+  );
+  const springVal = useSpring(motionVal, { stiffness: 90, damping: 50 });
+
+  const skippedInitialWhenStable = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!hasAnimated) return;
+    if (initiallyStable && !skippedInitialWhenStable.current) {
+      skippedInitialWhenStable.current = true;
+      return;
+    }
+    const timeoutId = setTimeout(() => {
+      if (isInView) motionVal.set(number);
+    }, delay);
+    return () => clearTimeout(timeoutId);
+  }, [hasAnimated, initiallyStable, isInView, number, motionVal, delay]);
+
+  // Spring-driven value (only used when `fromNumber` is given); otherwise derived directly.
+  const [springNumber, setEffectiveNumber] = React.useState<number>(
+    initiallyStable ? initialNumeric : 0,
+  );
+  const effectiveNumber = hasAnimated
+    ? springNumber
+    : initiallyStable
+      ? initialNumeric
+      : !isInView
+        ? 0
+        : initialNumeric;
+
+  React.useEffect(() => {
+    if (!hasAnimated) return;
+    const inferredDecimals =
+      typeof decimalPlaces === 'number' && decimalPlaces >= 0
+        ? decimalPlaces
+        : (() => {
+            const s = String(number);
+            const idx = s.indexOf('.');
+            return idx >= 0 ? s.length - idx - 1 : 0;
+          })();
+
+    const factor = Math.pow(10, inferredDecimals);
+
+    const unsubscribe = springVal.on('change', (latest: number) => {
+      const newValue =
+        inferredDecimals > 0
+          ? Math.round(latest * factor) / factor
+          : Math.round(latest);
+      setEffectiveNumber((current) => {
+        if (current !== newValue) onNumberChange?.(newValue);
+        return newValue;
+      });
+    });
+    return () => unsubscribe();
+  }, [hasAnimated, springVal, number, decimalPlaces, onNumberChange]);
+
+  const formatNumber = React.useCallback(
+    (num: number) =>
+      decimalPlaces != null ? num.toFixed(decimalPlaces) : num.toString(),
+    [decimalPlaces],
+  );
+
+  const numberStr = formatNumber(effectiveNumber);
+  const [newIntStrRaw, newDecStrRaw = ''] = numberStr.split('.');
+
+  const finalIntLength = padStart
+    ? Math.max(
+        Math.floor(Math.abs(number)).toString().length,
+        newIntStrRaw.length,
+      )
+    : newIntStrRaw.length;
+
+  const newIntStr = padStart
+    ? newIntStrRaw.padStart(finalIntLength, '0')
+    : newIntStrRaw;
+
+  const [tracked, setTracked] = React.useState({
+    current: effectiveNumber,
+    previous: initiallyStable ? initialNumeric : 0,
+  });
+  if (tracked.current !== effectiveNumber) {
+    setTracked({ current: effectiveNumber, previous: tracked.current });
+  }
+  const prevFormatted = formatNumber(tracked.previous);
+  const [prevIntStrRaw = '', prevDecStrRaw = ''] = prevFormatted.split('.');
+  const prevIntStr = padStart
+    ? prevIntStrRaw.padStart(finalIntLength, '0')
+    : prevIntStrRaw;
+
+  const adjustedPrevInt = React.useMemo(() => {
+    return prevIntStr.length > finalIntLength
+      ? prevIntStr.slice(-finalIntLength)
+      : prevIntStr.padStart(finalIntLength, '0');
+  }, [prevIntStr, finalIntLength]);
+
+  const adjustedPrevDec = React.useMemo(() => {
+    if (!newDecStrRaw) return '';
+    return prevDecStrRaw.length > newDecStrRaw.length
+      ? prevDecStrRaw.slice(0, newDecStrRaw.length)
+      : prevDecStrRaw.padEnd(newDecStrRaw.length, '0');
+  }, [prevDecStrRaw, newDecStrRaw]);
+
+  const intPlaces = React.useMemo(
+    () =>
+      Array.from({ length: finalIntLength }, (_, i) =>
+        Math.pow(10, finalIntLength - i - 1),
+      ),
+    [finalIntLength],
+  );
+  const decPlaces = React.useMemo(
+    () =>
+      newDecStrRaw
+        ? Array.from({ length: newDecStrRaw.length }, (_, i) =>
+            Math.pow(10, newDecStrRaw.length - i - 1),
+          )
+        : [],
+    [newDecStrRaw],
+  );
+
+  const newDecValue = newDecStrRaw ? parseInt(newDecStrRaw, 10) : 0;
+  const prevDecValue = adjustedPrevDec ? parseInt(adjustedPrevDec, 10) : 0;
+
+  return (
+    <motion.span
+      ref={localRef}
+      data-slot="sliding-number"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+      }}
+      {...props}
+    >
+      {isInView && Number(number) < 0 && (
+        <span style={{ marginRight: '0.25rem' }}>-</span>
+      )}
+
+      {intPlaces.map((place, idx) => {
+        const digitsToRight = intPlaces.length - idx - 1;
+        const isSeparatorPosition =
+          typeof thousandSeparator !== 'undefined' &&
+          digitsToRight > 0 &&
+          digitsToRight % 3 === 0;
+
+        return (
+          <React.Fragment key={`int-${place}`}>
+            <SlidingNumberRoller
+              prevValue={parseInt(adjustedPrevInt, 10)}
+              value={parseInt(newIntStr ?? '0', 10)}
+              place={place}
+              transition={transition}
+            />
+            {isSeparatorPosition && <span>{thousandSeparator}</span>}
+          </React.Fragment>
+        );
+      })}
+
+      {newDecStrRaw && (
+        <>
+          <span>{decimalSeparator}</span>
+          {decPlaces.map((place) => (
+            <SlidingNumberRoller
+              key={`dec-${place}`}
+              prevValue={prevDecValue}
+              value={newDecValue}
+              place={place}
+              transition={transition}
+              delay={delay}
+            />
+          ))}
+        </>
+      )}
+    </motion.span>
+  );
+}
+
+export { SlidingNumber, type SlidingNumberProps };

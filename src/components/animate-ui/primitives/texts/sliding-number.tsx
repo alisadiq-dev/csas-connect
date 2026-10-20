@@ -63,8 +63,8 @@ function SlidingNumberRoller({
         fontVariantNumeric: 'tabular-nums',
       }}
     >
-      <span style={{ visibility: 'hidden' }}>0</span>
-      {Array.from({ length: 10 }, (_, i) => (
+      <span style={{ visibility: height ? 'hidden' : 'visible' }}>{targetNumber}</span>
+      {height > 0 && Array.from({ length: 10 }, (_, i) => (
         <SlidingNumberDisplay
           key={i}
           motionValue={animatedValue}
@@ -101,7 +101,7 @@ function SlidingNumberDisplay({
 
   if (!height) {
     return (
-      <span style={{ visibility: 'hidden', position: 'absolute' }}>
+      <span style={{ position: 'relative', display: 'inline-block' }}>
         {number}
       </span>
     );

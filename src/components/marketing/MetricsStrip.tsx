@@ -21,7 +21,7 @@ export function MetricsStrip({ stats }: { stats: PublicStats | null }) {
         {items.map((m) => (
           <div key={m.label} className="bg-night-900/90 px-5 py-7 sm:px-7 sm:py-9">
             <dd className="flex items-baseline text-5xl font-light tracking-tight text-white sm:text-6xl">
-              <SlidingNumber number={m.value} inView inViewMargin="-10% 0px" aria-label={`${m.value}${m.suffix}`} />
+              <SlidingNumber number={m.value} aria-label={`${m.value}${m.suffix}`} />
               {m.suffix && <span className="text-3xl text-mint sm:text-4xl">{m.suffix}</span>}
             </dd>
             <dt className="mt-2 text-sm text-ice/65">{m.label}</dt>

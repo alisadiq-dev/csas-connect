@@ -19,7 +19,7 @@ export function RevealProvider() {
           }
         }
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+      { rootMargin: "0px 0px 60px 0px", threshold: 0.01 },
     );
     root.classList.add("reveal-ready");
     document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));

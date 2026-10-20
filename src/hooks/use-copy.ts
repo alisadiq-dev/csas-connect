@@ -12,29 +12,38 @@ export function useCopy(resetMs = 1600) {
   const copy = useCallback(
     async (key: string, text: string) => {
       let ok = false;
-      try {
-        await navigator.clipboard.writeText(text);
-        ok = true;
-      } catch {
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.setAttribute("readonly", "");
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
+      if (typeof navigator !== "undefined" && navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
         try {
-          ok = document.execCommand("copy");
+          await navigator.clipboard.writeText(text);
+          ok = true;
         } catch {
           ok = false;
         }
-        ta.remove();
       }
-      if (ok) {
-        setCopied(key);
-        clearTimeout(timer.current);
-        timer.current = setTimeout(() => setCopied(null), resetMs);
+
+      if (!ok && typeof document !== "undefined") {
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.fontSize = "16px";
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          ta.style.top = "0";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          ta.setSelectionRange(0, text.length);
+          ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+        } catch {
+          ok = false;
+        }
       }
+
+      setCopied(key);
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => setCopied(null), resetMs);
     },
     [resetMs],
   );

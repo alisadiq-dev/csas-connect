@@ -1,6 +1,11 @@
 import { Logo } from "@/components/brand/Logo";
-import { BellIcon, BuildingIcon, CalendarCheckIcon, ChartIcon, ClockIcon, UserIcon, UsersIcon } from "@/components/icons";
+import { BellIcon, BuildingIcon, UserIcon, UsersIcon } from "@/components/icons";
 import { AuroraBackground } from "@/components/effects/AuroraBackground";
+import { Meteors } from "@/components/effects/Meteors";
+import { Parallax } from "@/components/effects/Parallax";
+import { Spotlight } from "@/components/effects/Spotlight";
+import { WaveLines } from "@/components/effects/WaveLines";
+import { BentoGrid } from "@/components/marketing/BentoGrid";
 import { ShimmerButton } from "@/components/effects/ShimmerButton";
 import { Sparkles } from "@/components/effects/Sparkles";
 import { TiltCard } from "@/components/effects/TiltCard";
@@ -46,16 +51,21 @@ export default async function Home() {
       <MarketingNav />
 
       {/* Hero */}
+      <Spotlight className="isolate overflow-hidden">
       <section className="relative isolate overflow-hidden px-4 pt-32 pb-20 sm:px-6 lg:pt-40 lg:pb-28">
-        <AuroraBackground className="-z-10" />
+        <Parallax distance={50} className="absolute inset-0 -z-10">
+          <AuroraBackground />
+        </Parallax>
         <Sparkles className="-z-10" />
+        <Meteors className="-z-10" />
+        <WaveLines className="-z-10" />
         <div aria-hidden className="night-grid absolute inset-0 -z-10" />
         <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
           <div className="order-1 lg:order-2">
             <p className="inline-flex items-center gap-2 rounded-full border border-ice/20 bg-white/5 py-1.5 pr-4 pl-3 text-sm text-ice/85 backdrop-blur-sm">
               <span className="relative flex h-2 w-2" aria-hidden>
-                <span className="absolute inline-flex h-full w-full rounded-full bg-mint opacity-70 motion-safe:animate-ping" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-mint" />
+                <span className="absolute inline-flex h-full w-full rounded-full bg-ember opacity-70 motion-safe:animate-ping" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-ember" />
               </span>
               University of the Punjab · CSAS
             </p>
@@ -77,10 +87,13 @@ export default async function Home() {
             </div>
           </div>
           <div className="order-2 lg:order-1">
-            <HeroPanels />
+            <Parallax distance={24}>
+              <HeroPanels />
+            </Parallax>
           </div>
         </div>
       </section>
+      </Spotlight>
 
       {/* Metrics */}
       <section aria-label="Portal at a glance" className="px-4 sm:px-6">
@@ -117,22 +130,14 @@ export default async function Home() {
 
       {/* Bento */}
       <section className="px-4 py-20 sm:px-6 lg:py-28">
-        <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-3">
-          {[
-            { icon: CalendarCheckIcon, title: "Attendance you can trust", text: "Marked per session by teachers, summarised per course, with the 75% line made obvious." },
-            { icon: ChartIcon, title: "GPA, done properly", text: "Semester GPA and CGPA computed from credit hours and grade points — repeats and special statuses handled." },
-            { icon: ClockIcon, title: "A timetable that knows today", text: "Weekly grids per class, plus a today view with what's on now and what's next." },
-          ].map((f, i) => (
-            <div key={f.title} data-reveal style={{ "--reveal-delay": `${i * 90}ms` } as React.CSSProperties}>
-            <TiltCard className="glass h-full rounded-3xl bg-night-800/50 p-7">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-400/15 text-ice">
-                <f.icon className="h-5 w-5" />
-              </span>
-              <h3 className="mt-6 text-xl font-medium text-white">{f.title}</h3>
-              <p className="mt-2 leading-relaxed text-ice/70">{f.text}</p>
-            </TiltCard>
-            </div>
-          ))}
+        <div className="mx-auto max-w-6xl">
+          <p data-reveal className="text-sm font-medium tracking-wider text-ember uppercase">Made for the department</p>
+          <h2 data-reveal className="mt-3 max-w-2xl text-4xl font-light tracking-tight text-balance text-white sm:text-5xl">
+            Everything you check, one friendly place
+          </h2>
+          <div className="mt-12">
+            <BentoGrid attendanceRate={stats?.attendanceRate ?? null} />
+          </div>
         </div>
       </section>
 

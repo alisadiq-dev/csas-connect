@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { BellIcon, CalendarCheckIcon, ChartIcon, ClockIcon } from "@/components/icons";
 import { MiniBars, ProgressBar } from "@/components/ui/charts";
@@ -136,12 +137,17 @@ export function WorkspaceTabs() {
               aria-controls={`${uid}-panel`}
               tabIndex={i === active ? 0 : -1}
               onClick={() => setActive(i)}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-ice focus-visible:outline-none ${
-                i === active ? "border-transparent bg-ice text-night-900" : "border-ice/20 text-ice/80 hover:border-ice/50 hover:text-white"
+              className={`relative inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-ice focus-visible:outline-none ${
+                i === active ? "border-transparent text-night-900" : "border-ice/20 text-ice/80 hover:border-ice/50 hover:text-white"
               }`}
             >
+              {i === active && (
+                <motion.span layoutId={`${uid}-pill`} aria-hidden className="absolute inset-0 -z-0 rounded-full bg-ice shadow-[0_0_24px_rgb(186_215_245/0.35)]" transition={{ type: "spring", stiffness: 420, damping: 32 }} />
+              )}
+              <span className="relative z-10 inline-flex items-center gap-2">
               {t.icon}
               {t.label}
+              </span>
             </button>
           ))}
         </div>
@@ -163,7 +169,13 @@ export function WorkspaceTabs() {
           </div>
           <span className="text-[11px] text-ice/60">Illustrative preview · sample data</span>
         </div>
-        <div className="min-h-[15rem]">{tab.view}</div>
+        <div className="min-h-[15rem]">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div key={tab.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }}>
+              {tab.view}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

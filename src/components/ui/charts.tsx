@@ -70,9 +70,9 @@ export function MiniBars({
   const hi = tone === "dark" ? "bg-mint" : "bg-indigo-600";
   const lab = tone === "dark" ? "text-ice/60" : "text-slate-400";
   return (
-    <div role="img" aria-label={ariaLabel} className="flex gap-1.5" style={{ height: height + (labels ? 18 : 0) }}>
+    <div role="img" aria-label={ariaLabel} className="flex justify-center gap-1.5" style={{ height: height + (labels ? 18 : 0) }}>
       {values.map((v, i) => (
-        <div key={i} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+        <div key={i} className="flex min-w-0 max-w-16 flex-1 flex-col items-center gap-1">
           <div className="flex w-full flex-1 items-end">
             <div
               className={`w-full rounded-t-md ${i === values.length - 1 ? hi : base}`}

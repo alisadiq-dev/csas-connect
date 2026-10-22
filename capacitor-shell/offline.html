@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#070a13" />
+  <title>CSAS Connect — offline</title>
+  <style>
+    html, body { min-height: 100%; margin: 0; background: #070a13; color: #bad7f5; font-family: system-ui, sans-serif; }
+    body { display: grid; place-items: center; text-align: center; padding: 24px; box-sizing: border-box; min-height: 100vh; }
+    h1 { margin: 0; font-weight: 300; font-size: 1.6rem; color: #fff; }
+    p { max-width: 22rem; line-height: 1.5; opacity: .75; }
+    button { margin-top: 12px; min-height: 48px; padding: 0 28px; border: 0; border-radius: 999px; background: #bad7f5; color: #070a13; font-size: 1rem; font-weight: 500; }
+    button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Can&rsquo;t reach CSAS Connect</h1>
+    <p>Check your internet connection (or that the portal server is running), then try again.</p>
+    <button type="button" onclick="history.length > 1 ? history.back() : location.reload()">Try again</button>
+  </main>
+</body>
+</html>

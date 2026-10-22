@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { AlertIcon } from "@/components/icons";
+import { StatusToggle } from "@/components/ui/StatusToggle";
 import { createSessionAction, type CreateSessionState } from "./actions";
 
 const initialState: CreateSessionState = { error: null };
@@ -39,15 +40,7 @@ export function SessionForm({
                   <span className="text-slate-900">
                     {s.rollNumber} — {s.fullName}
                   </span>
-                  <select
-                    name={`status-${s.userId}`}
-                    defaultValue="present"
-                    className="rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                  >
-                    <option value="present">Present</option>
-                    <option value="absent">Absent</option>
-                    <option value="leave">Leave</option>
-                  </select>
+                  <StatusToggle name={`status-${s.userId}`} defaultValue="present" label={`Attendance for ${s.fullName}`} />
                 </li>
               ))}
             </ul>

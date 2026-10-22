@@ -5,6 +5,7 @@ import { Table, THead, Th, TBody, Tr, Td } from "@/components/ui/Table";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { UsersIcon } from "@/components/icons";
+import { TableFilter } from "@/components/ui/TableFilter";
 import { StudentForm } from "./student-form";
 
 export default async function StudentsPage() {
@@ -31,7 +32,7 @@ export default async function StudentsPage() {
       </Card>
 
       <Card>
-        <CardHeader title="Student accounts" description={`${students.length} student${students.length === 1 ? "" : "s"}`} />
+        <CardHeader title="Student accounts" description={`${students.length} student${students.length === 1 ? "" : "s"}`} action={students.length > 0 ? <TableFilter tableId="students-table" label="Search students" placeholder="Search name, roll no or class" /> : undefined} />
         <CardBody>
           {students.length === 0 ? (
             <EmptyState
@@ -40,7 +41,7 @@ export default async function StudentsPage() {
               description="Student accounts you create will show up here."
             />
           ) : (
-            <Table>
+            <Table id="students-table">
               <THead>
                 <Th>Roll No</Th>
                 <Th>Name</Th>

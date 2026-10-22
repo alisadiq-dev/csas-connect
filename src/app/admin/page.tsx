@@ -5,6 +5,8 @@ import { listAllOfferingsWithContext } from "@/lib/academic-structure/offerings"
 import { listTeachers } from "@/lib/identity/teachers";
 import { listAllStudents } from "@/lib/identity/students";
 import { PageHero } from "@/components/layout/PageHero";
+import { Sparkline } from "@/components/ui/Sparkline";
+import { getAdminTrends } from "@/lib/admin/trends";
 import { StatCard } from "@/components/ui/StatCard";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import {
@@ -34,12 +36,13 @@ const QUICK_LINKS = [
 ];
 
 export default async function AdminHomePage() {
-  const [programs, classes, offerings, teachers, students] = await Promise.all([
+  const [programs, classes, offerings, teachers, students, trends] = await Promise.all([
     listPrograms(),
     listAllClassesWithContext(),
     listAllOfferingsWithContext(),
     listTeachers(),
     listAllStudents(),
+    getAdminTrends(),
   ]);
 
   return (
@@ -51,12 +54,36 @@ export default async function AdminHomePage() {
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <StatCard icon={<BuildingIcon />} label="Programs" value={programs.length} tone="indigo" />
-        <StatCard icon={<LayersIcon />} label="Classes" value={classes.length} tone="sky" />
-        <StatCard icon={<LinkIcon />} label="Offerings" value={offerings.length} tone="amber" />
-        <StatCard icon={<UserIcon />} label="Teachers" value={teachers.length} tone="emerald" />
-        <StatCard icon={<UsersIcon />} label="Students" value={students.length} tone="rose" />
+        <StatCard icon={<BuildingIcon />} label="Programs" number={programs.length} tone="indigo" />
+        <StatCard icon={<LayersIcon />} label="Classes" number={classes.length} tone="sky" />
+        <StatCard icon={<LinkIcon />} label="Offerings" number={offerings.length} tone="amber" />
+        <StatCard icon={<UserIcon />} label="Teachers" number={teachers.length} tone="emerald" />
+        <StatCard icon={<UsersIcon />} label="Students" number={students.length} tone="rose" />
       </div>
+
+      {trends && (trends.sessions.some((n) => n > 0) || trends.notices.some((n) => n > 0)) && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {[
+            { title: "Attendance sessions marked", note: "per week, last 10 weeks", data: trends.sessions },
+            { title: "Notices & events posted", note: "per week, last 10 weeks", data: trends.notices },
+          ].map((t) => (
+            <Card key={t.title}>
+              <CardBody>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">{t.title}</p>
+                    <p className="text-xs text-slate-500">{t.note}</p>
+                  </div>
+                  <p className="text-3xl font-light text-slate-900">{t.data.reduce((a, b) => a + b, 0)}</p>
+                </div>
+                <div className="mt-3">
+                  <Sparkline values={t.data} width={300} height={56} ariaLabel={`${t.title}, weekly: ${t.data.join(", ")}`} />
+                </div>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <Card>
         <CardHeader title="Manage" description="Academic structure, people and records" />

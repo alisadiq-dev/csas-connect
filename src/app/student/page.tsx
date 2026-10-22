@@ -16,7 +16,10 @@ import { StatCard } from "@/components/ui/StatCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ScheduleList } from "@/components/dashboard/ScheduleList";
 import { CalendarCheckIcon, ChartIcon, ClockIcon, BookIcon, BellIcon } from "@/components/icons";
-import { MiniBars, ProgressBar, RingGauge } from "@/components/ui/charts";
+import { AttendanceGauge } from "@/components/ui/AttendanceGauge";
+import { MiniBars, ProgressBar } from "@/components/ui/charts";
+import { TrendBadge } from "@/components/ui/TrendBadge";
+import { Greeting } from "@/components/layout/Greeting";
 import { formatTime } from "@/lib/format";
 
 export default async function StudentDashboardPage() {
@@ -105,7 +108,9 @@ export default async function StudentDashboardPage() {
                 .toUpperCase()}
             </span>
             <div>
-              <p className="text-xs text-ice/70">Welcome back</p>
+              <p className="text-xs text-ice/70">
+                <Greeting />, glad you&apos;re here
+              </p>
               <h1 className="text-2xl font-light tracking-tight">{profile?.fullName ?? "Student"}</h1>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <Badge tone="brand">Roll {profile?.rollNumber}</Badge>
@@ -118,16 +123,10 @@ export default async function StudentDashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <RingGauge
-              value={overallAttendance}
-              size={92}
-              tone="dark"
-              danger={overallAttendance < 75}
-              label={`Overall attendance ${overallAttendance} percent`}
-            />
+            <AttendanceGauge value={overallAttendance} />
             <div className="text-sm">
               <p className="font-medium">Overall attendance</p>
-              <p className="text-xs text-ice/70">{overallAttendance < 75 ? "Below the 75% threshold" : "On track"}</p>
+              <p className={`text-xs ${overallAttendance < 75 ? "text-rose-300" : "text-emerald-300"}`}>{overallAttendance < 75 ? "Below the 75% line — let's catch up" : "Right on track — keep it up"}</p>
             </div>
           </div>
         </div>
@@ -135,15 +134,17 @@ export default async function StudentDashboardPage() {
 
       {/* Real-data stat cards */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard icon={<CalendarCheckIcon />} label="Overall attendance" value={`${overallAttendance}%`} tone="emerald" />
-        <StatCard icon={<ChartIcon />} label="CGPA" value={cgpa.toFixed(2)} tone="indigo" />
+        <StatCard icon={<CalendarCheckIcon />} label="Overall attendance" number={overallAttendance} suffix="%" tone="emerald" />
+        <StatCard icon={<ChartIcon />} label="CGPA" number={cgpa} decimals={2} tone="amber" />
         <StatCard
           icon={<ChartIcon />}
           label={currentSemester ? `Semester ${currentSemester} GPA` : "Semester GPA"}
-          value={semesterGpa.toFixed(2)}
+          number={semesterGpa}
+          decimals={2}
+          hint={gpaTrend.length >= 2 ? <TrendBadge delta={gpaTrend[gpaTrend.length - 1] - gpaTrend[gpaTrend.length - 2]} suffix=" vs previous semester" /> : undefined}
           tone="sky"
         />
-        <StatCard icon={<BookIcon />} label="Enrolled courses" value={courseCount} tone="amber" />
+        <StatCard icon={<BookIcon />} label="Enrolled courses" number={courseCount} tone="indigo" />
       </div>
 
       {(gpaTrend.length > 0 || courseAttendance.length > 0) && (
@@ -152,6 +153,9 @@ export default async function StudentDashboardPage() {
             <Card>
               <CardHeader title="GPA by semester" description="Computed from your published results" />
               <CardBody>
+                {gpaTrend.length < 2 && (
+                  <p className="mb-3 text-xs text-slate-500">Your trend line appears once a second semester is published.</p>
+                )}
                 <MiniBars
                   values={gpaTrend}
                   max={4}

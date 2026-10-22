@@ -3,6 +3,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Table, THead, Th, TBody, Tr, Td } from "@/components/ui/Table";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { UserIcon } from "@/components/icons";
+import { TableFilter } from "@/components/ui/TableFilter";
 import { TeacherForm } from "./teacher-form";
 
 export default async function TeachersPage() {
@@ -26,7 +27,7 @@ export default async function TeachersPage() {
       </Card>
 
       <Card>
-        <CardHeader title="Faculty accounts" description={`${teachers.length} teacher${teachers.length === 1 ? "" : "s"}`} />
+        <CardHeader title="Faculty accounts" description={`${teachers.length} teacher${teachers.length === 1 ? "" : "s"}`} action={teachers.length > 0 ? <TableFilter tableId="teachers-table" label="Search teachers" placeholder="Search by name" /> : undefined} />
         <CardBody>
           {teachers.length === 0 ? (
             <EmptyState
@@ -35,7 +36,7 @@ export default async function TeachersPage() {
               description="Teacher accounts you create will show up here."
             />
           ) : (
-            <Table>
+            <Table id="teachers-table">
               <THead>
                 <Th>Name</Th>
               </THead>

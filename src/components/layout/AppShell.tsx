@@ -1,8 +1,9 @@
 "use client";
 
+import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { Logo } from "@/components/brand/Logo";
 import {
   BellIcon,
@@ -52,6 +53,7 @@ function activeHref(pathname: string, sections: NavSection[]): string | undefine
 
 function SidebarNav({ sections, pathname, onNavigate }: { sections: NavSection[]; pathname: string; onNavigate?: () => void }) {
   const current = activeHref(pathname, sections);
+  const scope = useId();
   return (
     <nav className="flex flex-col gap-5 px-3">
       {sections.map((section, idx) => (
@@ -69,14 +71,20 @@ function SidebarNav({ sections, pathname, onNavigate }: { sections: NavSection[]
                     href={item.href}
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
-                    className={`flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
-                      active
-                        ? "bg-white/10 font-medium text-white shadow-[inset_2px_0_0_0_var(--color-mint)]"
-                        : "text-ice/70 hover:bg-white/5 hover:text-white"
+                    className={`relative flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
+                      active ? "font-medium text-white" : "text-ice/70 hover:bg-white/5 hover:text-white"
                     } focus-visible:ring-2 focus-visible:ring-ice focus-visible:outline-none`}
                   >
-                    <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-mint" : "text-ice/50"}`} />
-                    {item.label}
+                    {active && (
+                      <motion.span
+                        layoutId={`${scope}-side-active`}
+                        aria-hidden
+                        className="absolute inset-0 rounded-lg bg-white/10 shadow-[inset_2px_0_0_0_var(--color-ember)]"
+                        transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                      />
+                    )}
+                    <Icon className={`relative h-[18px] w-[18px] shrink-0 ${active ? "text-ember" : "text-ice/50"}`} />
+                    <span className="relative">{item.label}</span>
                   </Link>
                 </li>
               );
@@ -94,13 +102,14 @@ function BottomNav({ sections, pathname, onMore }: { sections: NavSection[]; pat
   const flagged = all.filter((i) => i.primary);
   const tabs = (flagged.length > 0 ? flagged : all).slice(0, 4);
   const current = activeHref(pathname, sections);
+  const scope = useId();
 
   return (
     <nav
       aria-label="Quick navigation"
       className="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-30 lg:hidden"
     >
-      <ul className="flex items-stretch rounded-3xl border border-white/10 bg-night-900/90 p-1.5 shadow-2xl shadow-black/30 backdrop-blur-xl">
+      <ul className="flex items-stretch rounded-full border border-white/10 bg-night-950/80 p-1.5 shadow-[0_10px_40px_-8px_rgb(0_0_0/0.6)] backdrop-blur-xl">
         {tabs.map((item) => {
           const Icon = ICONS[item.icon];
           const active = item.href === current;
@@ -109,12 +118,22 @@ function BottomNav({ sections, pathname, onMore }: { sections: NavSection[]; pat
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-[11px] font-medium transition-[background-color,color,transform] duration-200 active:scale-95 focus-visible:ring-2 focus-visible:ring-ice focus-visible:outline-none motion-reduce:transition-none ${
-                  active ? "bg-white/10 text-mint" : "text-ice/70"
+                className={`relative flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-full px-1 text-[11px] font-medium transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-ice focus-visible:outline-none motion-reduce:transition-none ${
+                  active ? "text-night-950" : "text-ice/70"
                 }`}
               >
-                <Icon className="h-5 w-5" />
-                <span className="max-w-full truncate">{item.label}</span>
+                {active && (
+                  <motion.span
+                    layoutId={`${scope}-bottom-active`}
+                    aria-hidden
+                    className="absolute inset-0 rounded-full bg-ice shadow-[0_0_22px_rgb(186_215_245/0.35)]"
+                    transition={{ type: "spring", stiffness: 430, damping: 30 }}
+                  />
+                )}
+                <motion.span className="relative" animate={active ? { y: [0, -3, 0], scale: [1, 1.15, 1] } : { y: 0, scale: 1 }} transition={{ duration: 0.4 }}>
+                  <Icon className="h-5 w-5" />
+                </motion.span>
+                <span className="relative max-w-full truncate">{item.label}</span>
               </Link>
             </li>
           );
@@ -124,7 +143,7 @@ function BottomNav({ sections, pathname, onMore }: { sections: NavSection[]; pat
             type="button"
             onClick={onMore}
             aria-haspopup="dialog"
-            className="flex min-h-14 w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-[11px] font-medium text-ice/70 transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-ice focus-visible:outline-none motion-reduce:transition-none"
+            className="flex min-h-14 w-full flex-col items-center justify-center gap-0.5 rounded-full px-1 text-[11px] font-medium text-ice/70 transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-ice focus-visible:outline-none motion-reduce:transition-none"
           >
             <MenuIcon className="h-5 w-5" />
             More

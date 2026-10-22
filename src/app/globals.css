@@ -18,13 +18,15 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --color-night-950: #080b14;
-  --color-night-900: #0d111c;
-  --color-night-800: #131a2b;
-  --color-night-700: #1b2540;
-  --color-night-600: #26335a;
+  --color-night-950: #070a13;
+  --color-night-900: #0d1322;
+  --color-night-800: #141c33;
+  --color-night-700: #1d2848;
+  --color-night-600: #2b3963;
   --color-ice: #bad7f5;
   --color-mint: #6beccd;
+  --color-sapphire: #5b8cff;
+  --color-ember: #f6b45a;
 
   --animate-float: float 7s ease-in-out infinite;
   --animate-rise: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -33,6 +35,9 @@
   --animate-aurora-slow: aurora 26s ease-in-out infinite alternate-reverse;
   --animate-shimmer: shimmer 3.2s ease-in-out infinite;
   --animate-twinkle: twinkle 4s ease-in-out infinite;
+  --animate-meteor: meteor 6s linear infinite;
+  --animate-wave: wave 14s ease-in-out infinite alternate;
+  --animate-pulse-ring: pulse-ring 2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
 }
 
 @keyframes float {
@@ -54,6 +59,20 @@
 @keyframes shimmer {
   0% { transform: translate3d(-130%, 0, 0) skewX(-20deg); }
   60%, 100% { transform: translate3d(330%, 0, 0) skewX(-20deg); }
+}
+@keyframes meteor {
+  0% { transform: rotate(215deg) translate3d(0, 0, 0); opacity: 0; }
+  8% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: rotate(215deg) translate3d(-520px, 0, 0); opacity: 0; }
+}
+@keyframes wave {
+  from { transform: translate3d(-4%, 0, 0); }
+  to { transform: translate3d(4%, 6px, 0); }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  80%, 100% { transform: scale(2.4); opacity: 0; }
 }
 @keyframes twinkle {
   0%, 100% { opacity: 0.15; transform: scale(0.8); }
@@ -123,7 +142,7 @@ body {
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgb(107 236 205 / 0.75), rgb(122 167 255 / 0.35) 45%, transparent 70%);
+    background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgb(246 180 90 / 0.8), rgb(107 236 205 / 0.45) 40%, transparent 70%);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;

@@ -30,6 +30,24 @@ Demo login credentials after seeding (local dev only — see "Local auth shim" b
 
 The landing page ("Try it with a test account") and the login page ("Quick fill") show the seeded demo logins for one-tap copy/fill. They are **only shown outside production**; set `SHOW_DEMO_ACCOUNTS=true` to show them on a deployed site (don't, unless that deployment is a throwaway demo).
 
+### Android app (APK)
+
+The Android app (`com.csas.connect`, built with Capacitor) is a native shell that loads the live portal in a WebView — the portal is server-rendered (login, server actions, Postgres), so it can't be bundled as static files. Which site it opens is fixed at build time by `CAP_SERVER_URL`:
+
+```bash
+# APK you can send to anyone — needs the portal deployed at a public HTTPS URL:
+CAP_SERVER_URL=https://your-deployed-site npm run android:apk
+
+# Quick test APK for your own phone on the same Wi-Fi (opens http://<this Mac's LAN IP>:3000, so `npm run dev` must be running):
+npm run android:apk
+```
+
+Output: `android/app/build/outputs/apk/debug/app-debug.apk` (debug-signed; enable "install unknown apps" on the phone to sideload it). Needs JDK 17+ and the Android SDK (platform 36, build-tools 36.0.0); the script uses `JAVA_HOME` / `ANDROID_HOME` or `~/.local/jdk-21*` and `~/Library/Android/sdk`. Plain-http URLs are allowed only for builds whose URL starts with `http://`.
+
+- Icons/splash are generated from `resources/*.png` (`npx capacitor-assets generate --android`); app config is `capacitor.config.ts`; local loading/offline pages are in `capacitor-shell/`.
+- Deep links: `csasconnect://notices`, `csasconnect://student/results`, … open that page in the app (`src/components/native/CapacitorBridge.tsx`).
+- For the Play Store you'd need a release-signed build (keystore) and, for https App Links, an `assetlinks.json` on your domain — not set up here.
+
 ### Install as an app (PWA)
 
 `/manifest.webmanifest` + generated icons (`/pwa-icon/*`, `/apple-icon`) make the site installable: on a phone use "Add to Home Screen" and it opens full-screen with a bottom tab bar. There is no service worker, so it needs a connection.

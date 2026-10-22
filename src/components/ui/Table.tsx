@@ -1,9 +1,9 @@
 import type { ReactNode, ThHTMLAttributes, TdHTMLAttributes } from "react";
 
-export function Table({ children }: { children: ReactNode }) {
+export function Table({ children, id }: { children: ReactNode; id?: string }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[36rem] text-left text-sm">{children}</table>
+      <table id={id} className="w-full min-w-[36rem] text-left text-sm">{children}</table>
     </div>
   );
 }

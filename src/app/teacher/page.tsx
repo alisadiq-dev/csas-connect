@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ScheduleList } from "@/components/dashboard/ScheduleList";
 import { BellIcon, BookIcon, ClockIcon, LayersIcon } from "@/components/icons";
 import { PageHero } from "@/components/layout/PageHero";
+import { Sparkline } from "@/components/ui/Sparkline";
 import { formatTime } from "@/lib/format";
 
 export default async function TeacherDashboardPage() {
@@ -59,6 +60,8 @@ export default async function TeacherDashboardPage() {
   }
   const programCount = new Set(Array.from(assignedOfferings.values()).map((o) => o.programName)).size;
   const recentNotices = notices.slice(0, 4);
+  const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat"] as const;
+  const classesPerDay = DAYS.map((d) => slots.filter((s) => s.dayOfWeek === d).length);
 
   return (
     <div className="flex flex-col gap-6">
@@ -80,10 +83,10 @@ export default async function TeacherDashboardPage() {
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard icon={<BookIcon />} label="Assigned offerings" value={assignedOfferings.size} tone="indigo" />
-        <StatCard icon={<LayersIcon />} label="Programs taught" value={programCount} tone="sky" />
-        <StatCard icon={<ClockIcon />} label="Classes today" value={todaySchedule.length} tone="amber" />
-        <StatCard icon={<BellIcon />} label="Recent notices" value={notices.length} tone="emerald" />
+        <StatCard icon={<BookIcon />} label="Assigned offerings" number={assignedOfferings.size} tone="indigo" />
+        <StatCard icon={<LayersIcon />} label="Programs taught" number={programCount} tone="sky" />
+        <StatCard icon={<ClockIcon />} label="Classes today" number={todaySchedule.length} tone="amber" />
+        <StatCard icon={<BellIcon />} label="Recent notices" number={notices.length} tone="emerald" />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -147,6 +150,23 @@ export default async function TeacherDashboardPage() {
           </CardBody>
         </Card>
       </div>
+
+      {classesPerDay.some((n) => n > 0) && (
+        <Card>
+          <CardHeader title="Your week at a glance" description="Scheduled classes per weekday" />
+          <CardBody>
+            <Sparkline values={classesPerDay} width={320} height={64} ariaLabel={`Classes per weekday Monday to Saturday: ${classesPerDay.join(", ")}`} />
+            <div className="mt-2 flex max-w-[320px] justify-between text-[11px] text-slate-400" aria-hidden>
+              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d, i) => (
+                <span key={d} className="text-center">
+                  {d}
+                  <span className="block font-medium text-slate-600">{classesPerDay[i]}</span>
+                </span>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
       <Card>
         <CardHeader

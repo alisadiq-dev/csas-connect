@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { CapacitorBridge } from "@/components/native/CapacitorBridge";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import "./globals.css";
 
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <LenisProvider>{children}</LenisProvider>
+        <CapacitorBridge />
       </body>
     </html>
   );

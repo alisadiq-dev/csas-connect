@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { StatNumber } from "@/components/marketing/StatNumber";
+import { Sparkline } from "@/components/ui/Sparkline";
 
 export type StatTone = "indigo" | "emerald" | "amber" | "rose" | "sky";
 
@@ -15,13 +17,25 @@ export function StatCard({
   icon,
   label,
   value,
+  number,
+  decimals = 0,
+  suffix,
   hint,
+  trend,
+  trendLabel,
   tone = "indigo",
 }: {
   icon: ReactNode;
   label: string;
-  value: ReactNode;
+  /** Static content. Prefer `number` for numeric metrics so the figure rolls in with a sliding-number animation. */
+  value?: ReactNode;
+  number?: number;
+  decimals?: number;
+  suffix?: string;
   hint?: ReactNode;
+  /** Optional real series drawn as an animated trend line. */
+  trend?: number[];
+  trendLabel?: string;
   tone?: StatTone;
 }) {
   return (
@@ -29,9 +43,16 @@ export function StatCard({
       <div className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${TONE_CLASSES[tone]}`}>
         <span className="h-5 w-5">{icon}</span>
       </div>
-      <div className="mt-3 text-3xl font-light tracking-tight text-slate-900">{value}</div>
+      <div className="mt-3 flex items-baseline text-3xl font-light tracking-tight text-slate-900">
+        {number !== undefined ? <StatNumber value={number} decimals={decimals} suffix={suffix} suffixClassName="text-xl text-slate-500" /> : value}
+      </div>
       <div className="text-xs text-slate-500">{label}</div>
-      {hint && <div className="mt-1 text-[11px] text-slate-400">{hint}</div>}
+      {hint && <div className="mt-1.5 text-[11px] text-slate-400">{hint}</div>}
+      {trend && trend.length > 1 && (
+        <div className="mt-3">
+          <Sparkline values={trend} width={140} height={34} ariaLabel={trendLabel ?? `${label} trend`} />
+        </div>
+      )}
     </div>
   );
 }

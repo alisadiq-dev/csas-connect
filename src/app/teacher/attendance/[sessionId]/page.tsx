@@ -6,6 +6,7 @@ import { Table, THead, Th, TBody, Tr, Td } from "@/components/ui/Table";
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { UsersIcon } from "@/components/icons";
+import { StatusToggle } from "@/components/ui/StatusToggle";
 
 const STATUS_TONE: Record<string, BadgeTone> = {
   present: "success",
@@ -67,15 +68,7 @@ export default async function TeacherAttendanceSessionPage({
                       <form action={correctRecordAction} className="flex items-center gap-2">
                         <input type="hidden" name="recordId" value={r.id} />
                         <input type="hidden" name="sessionId" value={sessionId} />
-                        <select
-                          name="status"
-                          defaultValue={r.status}
-                          className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                        >
-                          <option value="present">Present</option>
-                          <option value="absent">Absent</option>
-                          <option value="leave">Leave</option>
-                        </select>
+                        <StatusToggle name="status" defaultValue={r.status} label={`Status for ${r.fullName}`} />
                         <button
                           type="submit"
                           className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700"
